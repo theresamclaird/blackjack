@@ -2,7 +2,7 @@ import React, { forwardRef } from 'react';
 import PropTypes from 'prop-types';
 import Box from '../Box';
 
-const Text = forwardRef(({
+export const Text = forwardRef(({
     as, sx, children, ...props
 }, ref) => (
     <Box
@@ -29,5 +29,3 @@ Text.propTypes = {
     sx: PropTypes.objectOf(PropTypes.any),
     children: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
 };
-
-export default Text;

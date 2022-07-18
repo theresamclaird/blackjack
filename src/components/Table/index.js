@@ -1,3 +1,1 @@
-import Table from './Table';
-
-export { Table, Table as deafault };
+export * from './Table';
