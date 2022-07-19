@@ -1,116 +1,13 @@
 import React from 'react';
 import { Box, Flex } from '../Box';
-import jackHearts from '../../faces/jack-hearts.svg';
-import queenHearts from '../../faces/queen-hearts.svg';
-import kingHearts from '../../faces/king-hearts.svg';
-import jackSpades from '../../faces/jack-spades.svg';
-import queenSpades from '../../faces/queen-spades.svg';
-import kingSpades from '../../faces/king-spades.svg';
-import jackDiamonds from '../../faces/jack-diamonds.svg';
-import queenDiamonds from '../../faces/queen-diamonds.svg';
-import kingDiamonds from '../../faces/king-diamonds.svg';
-import jackClubs from '../../faces/jack-clubs.svg';
-import queenClubs from '../../faces/queen-clubs.svg';
-import kingClubs from '../../faces/king-clubs.svg';
-
-const Pip = ({ sx, pip }) => (
-    <Flex sx={{
-        fontSize: '1.5em',
-        gridRowEnd: 'span 2',
-        width: '100%',
-        height: '0.8em',
-        aspectRatio: '1 / 1',
-        ...sx,
-    }}>
-        <Flex sx={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: '100%' }}>
-            {pip}
-        </Flex>
-    </Flex>
-);
-
-const CornerNumber = ({ sx, color, rank, value, pip }) => {
-    let symbol = value;
-    switch (rank) {
-        case 1:
-            symbol = 'A';
-            break;
-        case 'jack':
-            symbol = 'J';
-            break;
-        case 'queen':
-            symbol = 'Q';
-            break;
-        case 'king':
-            symbol = 'K';
-            break;
-        default:
-            symbol = value;
-            break;
-    }
-    return (
-        <Flex sx={{
-            color,
-            fontSize: '0.7em',
-            position: 'absolute',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            lineHeight: '1em',
-            '&::after': {
-                content: `"${pip}"`,
-                width: '0.5em',
-                mt: '0.1em',
-                lineHeight: '0.5em',
-                display: 'block',
-            },
-            ...sx,
-        }}><Box sx={{ color }}>{symbol}</Box></Flex>
-    );
-};
-
-    const Face = ({ suit, rank }) => {
-    const imageSrc = {
-        hearts: {
-            jack: jackHearts,
-            queen: queenHearts,
-            king: kingHearts,
-        },
-        spades: {
-            jack: jackSpades,
-            queen: queenSpades,
-            king: kingSpades,
-        },
-        diamonds: {
-            jack: jackDiamonds,
-            queen: queenDiamonds,
-            king: kingDiamonds,
-        },
-        clubs: {
-            jack: jackClubs,
-            queen: queenClubs,
-            king: kingClubs,
-        },
-    }[suit][rank]
-    return (
-        <Flex sx={{
-            m: 0,
-            p: 0,
-            gridRowStart: 2,
-            gridRowEnd: 'span 14',
-            gridColumnStart: 2,
-            gridColumnEnd: 'span 4',
-            justifyContent: 'center',
-            alignItems: 'center',
-            '& > img': { border: 'solid 1px #00f', m: 0, p: 0, height: '100%' },
-        }}>
-            <img src={imageSrc} />
-        </Flex>
-    );
-};
+import Pip from './Pip';
+import Corner from './Corner';
+import Face from './Face';
 
 export const Card = ({ suit, rank, value }) => {
     const pip = { hearts: '♥', diamonds: '♦️', clubs: '♣️', spades: '♠' }[suit];
     const color = suit === 'hearts' || suit === 'diamonds' ? 'red' : 'black';
+
     const pipStyle = {
         1: {
             '& > :first-of-type': {
@@ -501,23 +398,21 @@ export const Card = ({ suit, rank, value }) => {
 
     const cardWidth = 4;
     const cardHeight = cardWidth * 1.4;
-
     const isFace = rank === 'jack' || rank === 'queen' || rank === 'king';
-
-    const applesauce = isFace ? {} : pipStyle;
+    const applesauce = isFace ? {} : pipStyle; // todo fix this.
 
     return (
         <Box sx={{
-            boxShadow: '0 0 5px #000',
+            boxShadow: '0 0 2px #666',
             position: 'relative',
             backgroundColor: 'white',
             border: 'solid 1px',
             borderColor: 'black',
             borderRadius: '0.25em',
-            p: '0.3em',
+            p: '0.5em',
         }}>
             <Box sx={{
-                px: '0.6em',
+                px: '0.5em',
                 width: `${cardWidth}em`,
                 height: `${cardHeight}em`,
                 display: 'grid',
@@ -526,9 +421,9 @@ export const Card = ({ suit, rank, value }) => {
                 overflow: 'hidden',
                 ...applesauce,
             }}>
-                {rank === 'jack' || rank === 'queen' || rank === 'king' ? <Face suit={suit} rank={rank} /> : <Pips value={value} />}
-                <CornerNumber rank={rank} value={value} pip={pip} color={color} sx={{ top: '0.25em', left: '0.25em' }} />
-                <CornerNumber rank={rank} value={value} pip={pip} color={color} sx={{ bottom: '0.25em', right: '0.25em', transform: 'rotate(180deg)' }} />
+                {isFace ? <Face suit={suit} rank={rank} pip={pip} color={color} /> : <Pips value={value} />}
+                <Corner rank={rank} pip={pip} sx={{ top: '0.25em', left: '0.25em', color }} />
+                <Corner rank={rank} pip={pip} sx={{ bottom: '0.25em', right: '0.25em', transform: 'rotate(180deg)', color }} />
             </Box>
         </Box>
     );

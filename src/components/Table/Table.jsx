@@ -53,7 +53,7 @@ export const Table = ({ sx, seats = [...Array(configuration.numberOfSeats).keys(
             bg: 'feltGreen',
             p: 'xxl',
             flexDirection: 'column',
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
             alignItems: 'center',
             border: 'solid 2px',
             borderColor: 'black',
