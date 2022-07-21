@@ -1,5 +1,6 @@
 const colors = {
     feltGreen: '#35654d',
+    darkGreen: '#003300',
     yellow: '#ffff00',
     gray: '#ccc',
     black: '#000',
@@ -12,6 +13,7 @@ space.md = space[2];
 space.lg = space[3];
 space.xl = space[4];
 space.xxl = space[5];
+space.xxxl = space[6];
 
 const fonts = {
     default: 'Arial, Helvetica, sans-serif',

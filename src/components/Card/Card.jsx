@@ -4,7 +4,7 @@ import Pip from './Pip';
 import Corner from './Corner';
 import Face from './Face';
 
-export const Card = ({ suit, rank, value }) => {
+export const Card = ({ sx, suit, rank, value }) => {
     const pip = { hearts: '♥', diamonds: '♦️', clubs: '♣️', spades: '♠' }[suit];
     const color = suit === 'hearts' || suit === 'diamonds' ? 'red' : 'black';
 
@@ -396,8 +396,6 @@ export const Card = ({ suit, rank, value }) => {
         return pipsArray;
     };
 
-    const cardWidth = 4;
-    const cardHeight = cardWidth * 1.4;
     const isFace = rank === 'jack' || rank === 'queen' || rank === 'king';
     const applesauce = isFace ? {} : pipStyle; // todo fix this.
 
@@ -408,13 +406,15 @@ export const Card = ({ suit, rank, value }) => {
             backgroundColor: 'white',
             border: 'solid 1px',
             borderColor: 'black',
-            borderRadius: '0.25em',
-            p: '0.5em',
+            borderRadius: '0.25rem',
+            p: '0.5rem',
+            ...sx,
         }}>
             <Box sx={{
-                px: '0.5em',
-                width: `${cardWidth}em`,
-                height: `${cardHeight}em`,
+                display: 'block',
+                px: '0.5rem',
+                width: `4rem`,
+                height: `${4 * 1.4}rem`,
                 display: 'grid',
                 gridTemplateColumns: 'repeat(6, 1fr)',
                 gridTemplateRows: 'repeat(16, 1fr)',
@@ -422,8 +422,8 @@ export const Card = ({ suit, rank, value }) => {
                 ...applesauce,
             }}>
                 {isFace ? <Face suit={suit} rank={rank} pip={pip} color={color} /> : <Pips value={value} />}
-                <Corner rank={rank} pip={pip} sx={{ top: '0.25em', left: '0.25em', color }} />
-                <Corner rank={rank} pip={pip} sx={{ bottom: '0.25em', right: '0.25em', transform: 'rotate(180deg)', color }} />
+                <Corner rank={rank} pip={pip} sx={{ top: '0.25rem', left: '0.25rem', color }} />
+                <Corner rank={rank} pip={pip} sx={{ bottom: '0.25rem', right: '0.25rem', transform: 'rotate(180deg)', color }} />
             </Box>
         </Box>
     );

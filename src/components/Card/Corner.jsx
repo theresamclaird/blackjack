@@ -13,8 +13,8 @@ const Corner = ({ sx, rank, pip }) => {
             flexDirection: 'column',
             justifyContent: 'flex-start',
             alignItems: 'center',
-            fontSize: '0.8em',
-            lineHeight: '0.85em',
+            fontSize: '0.7rem',
+            lineHeight: '0.7rem',
             '&::after': { content: `"${pip}"` },
             ...sx,
         }}><Box>{symbol}</Box></Flex>

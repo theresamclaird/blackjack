@@ -22,59 +22,62 @@ const Face = ({ rank, suit, pip, color }) => {
         king: { hearts: kingHearts, spades: kingSpades, diamonds: kingDiamonds, clubs: kingClubs },
     }[rank][suit];
 
+    const pipVerticalDistance = '0.7rem';
+    const pipHorizontalDistance = '1.05rem';
+
     const topPipStyle = {
         jack: {
             hearts: {
-                top: '0.6em',
-                right: '0.8em',
+                top: pipVerticalDistance,
+                right: pipHorizontalDistance,
             },
             spades: {
-                top: '0.6em',
-                left: '0.8em',
+                top: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
             diamonds: {
-                top: '0.6em',
-                right: '0.8em',
+                top: pipVerticalDistance,
+                right: pipHorizontalDistance,
             },
             clubs: {
-                top: '0.6em',
-                right: '0.8em',
+                top: pipVerticalDistance,
+                right: pipHorizontalDistance,
             },
         },
         queen: {
             hearts: {
-                top: '0.6em',
-                left: '0.8em',
+                top: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
             spades: {
-                top: '0.6em',
-                right: '0.8em',
+                top: pipVerticalDistance,
+                right: pipHorizontalDistance,
             },
             diamonds: {
-                top: '0.6em',
-                right: '0.8em',
+                top: pipVerticalDistance,
+                right: pipHorizontalDistance,
             },
             clubs: {
-                top: '0.6em',
-                right: '0.8em',
+                top: pipVerticalDistance,
+                right: pipHorizontalDistance,
             },
         },
         king: {
             hearts: {
-                top: '0.6em',
-                left: '0.8em',
+                top: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
             spades: {
-                top: '0.6em',
-                left: '0.8em',
+                top: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
             diamonds: {
-                top: '0.6em',
-                left: '0.8em',
+                top: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
             clubs: {
-                top: '0.6em',
-                left: '0.8em',
+                top: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
         },
     }[rank][suit];
@@ -82,56 +85,56 @@ const Face = ({ rank, suit, pip, color }) => {
     const bottomPipStyle = {
         jack: {
             hearts: {
-                bottom: '0.6em',
-                left: '0.8em',
+                bottom: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
             spades: {
-                bottom: '0.6em',
-                right: '0.8em',
+                bottom: pipVerticalDistance,
+                right: pipHorizontalDistance,
             },
             diamonds: {
-                bottom: '0.6em',
-                left: '0.8em',
+                bottom: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
             clubs: {
-                bottom: '0.6em',
-                left: '0.8em',
+                bottom: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
         },
         queen: {
             hearts: {
-                bottom: '0.6em',
-                right: '0.8em',
+                bottom: pipVerticalDistance,
+                right: pipHorizontalDistance,
             },
             spades: {
-                bottom: '0.6em',
-                left: '0.8em',
+                bottom: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
             diamonds: {
-                bottom: '0.6em',
-                left: '0.8em',
+                bottom: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
             clubs: {
-                bottom: '0.6em',
-                left: '0.8em',
+                bottom: pipVerticalDistance,
+                left: pipHorizontalDistance,
             },
         },
         king: {
             hearts: {
-                bottom: '0.6em',
-                right: '0.8em',
+                bottom: pipVerticalDistance,
+                right: '1rem',
             },
             spades: {
-                bottom: '0.6em',
-                right: '0.8em',
+                bottom: pipVerticalDistance,
+                right: pipHorizontalDistance,
             },
             diamonds: {
-                bottom: '0.6em',
-                right: '0.8em',
+                bottom: pipVerticalDistance,
+                right: pipHorizontalDistance,
             },
             clubs: {
-                bottom: '0.6em',
-                right: '0.8em',
+                bottom: pipVerticalDistance,
+                right: pipHorizontalDistance,
             },
         },
     }[rank][suit];
@@ -149,7 +152,7 @@ const Face = ({ rank, suit, pip, color }) => {
                 <Box
                     sx={{
                         border: 'solid 1px #00f',
-                        borderRadius: '0.15em',
+                        borderRadius: '0.15rem',
                         height: '100%',
                     }}
                     as="img"
@@ -157,8 +160,8 @@ const Face = ({ rank, suit, pip, color }) => {
                     alt=""
                 />
             </Flex>
-            <Pip pip={pip} sx={{ fontSize: '1.3em', position: 'absolute', color, ...topPipStyle}} />
-            <Pip pip={pip} sx={{ fontSize: '1.3em', position: 'absolute', color, transform: 'rotate(180deg)', ...bottomPipStyle }} />
+            <Pip pip={pip} sx={{ fontSize: '1.3rem', position: 'absolute', color, ...topPipStyle}} />
+            <Pip pip={pip} sx={{ fontSize: '1.3rem', position: 'absolute', color, transform: 'rotate(180deg)', ...bottomPipStyle }} />
         </>
     );
 };
