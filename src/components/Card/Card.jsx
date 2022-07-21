@@ -1,10 +1,10 @@
 import React from 'react';
-import { Box, Flex } from '../Box';
+import { Box } from '../Box';
 import Pip from './Pip';
 import Corner from './Corner';
 import Face from './Face';
 
-export const Card = ({ sx, suit, rank, value }) => {
+export const Card = ({ sx, suit, rank, value, showBack = false }) => {
     const pip = { hearts: '♥', diamonds: '♦️', clubs: '♣️', spades: '♠' }[suit];
     const color = suit === 'hearts' || suit === 'diamonds' ? 'red' : 'black';
 
@@ -399,6 +399,36 @@ export const Card = ({ sx, suit, rank, value }) => {
     const isFace = rank === 'jack' || rank === 'queen' || rank === 'king';
     const applesauce = isFace ? {} : pipStyle; // todo fix this.
 
+    const Front = () => (
+        <Box sx={{
+            px: '0.5rem',
+            width: `4rem`,
+            height: `${4 * 1.4}rem`,
+            display: 'grid',
+            gridTemplateColumns: 'repeat(6, 1fr)',
+            gridTemplateRows: 'repeat(16, 1fr)',
+            overflow: 'hidden',
+            ...applesauce,
+        }}>
+            {isFace ? <Face suit={suit} rank={rank} pip={pip} color={color} /> : <Pips value={value} />}
+            <Corner rank={rank} pip={pip} sx={{ top: '0.25rem', left: '0.25rem', color }} />
+            <Corner rank={rank} pip={pip} sx={{ bottom: '0.25rem', right: '0.25rem', transform: 'rotate(180deg)', color }} />
+        </Box>
+    );
+
+    const Back = () => (
+        <Box sx={{
+            px: '0.5rem',
+            width: '4rem',
+            height: `${4 * 1.4}rem`,
+            backgroundColor: '#e5e5f7',
+            opacity: '0.8',
+            backgroundImage: 'linear-gradient(30deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(150deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(30deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(150deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(60deg, #444cf777 25%, transparent 25.5%, transparent 75%, #444cf777 75%, #444cf777), linear-gradient(60deg, #444cf777 25%, transparent 25.5%, transparent 75%, #444cf777 75%, #444cf777)',
+            backgroundSize: '8px 14px',
+            backgroundPosition: '0 0, 0 0, 4px 7px, 4px 7px, 0 0, 4px 7px',
+        }} />
+    );
+
     return (
         <Box sx={{
             boxShadow: '0 0 2px #666',
@@ -410,21 +440,7 @@ export const Card = ({ sx, suit, rank, value }) => {
             p: '0.5rem',
             ...sx,
         }}>
-            <Box sx={{
-                display: 'block',
-                px: '0.5rem',
-                width: `4rem`,
-                height: `${4 * 1.4}rem`,
-                display: 'grid',
-                gridTemplateColumns: 'repeat(6, 1fr)',
-                gridTemplateRows: 'repeat(16, 1fr)',
-                overflow: 'hidden',
-                ...applesauce,
-            }}>
-                {isFace ? <Face suit={suit} rank={rank} pip={pip} color={color} /> : <Pips value={value} />}
-                <Corner rank={rank} pip={pip} sx={{ top: '0.25rem', left: '0.25rem', color }} />
-                <Corner rank={rank} pip={pip} sx={{ bottom: '0.25rem', right: '0.25rem', transform: 'rotate(180deg)', color }} />
-            </Box>
+            {showBack ? <Back /> : <Front />}
         </Box>
     );
 };

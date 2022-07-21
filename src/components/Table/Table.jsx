@@ -67,6 +67,14 @@ class DealerHand extends Hand {
         super();
         this.bet = null;
         this.cards = cards;
+        this.hide = true;
+    }
+    get reportHandValue() {
+        if (this.hide) { return this.cards[1].value }
+        return super.reportHandValue;
+    }
+    showHiddenCard() {
+        this.hide = false;
     }
 }
 
@@ -94,6 +102,7 @@ export const Table = () => {
     };
     const dealerAction = () => {
         const newHand = new DealerHand(dealerHand.cards);
+        newHand.showHiddenCard();
         while (newHand.value.soft < 18 && newHand.value.hard < 17) {
             newHand.addCard(shoe.pop());
         }
