@@ -75,9 +75,11 @@ export const Table = () => {
 
     const dealerAction = () => {
         const cards = [...dealerCards];
-        while (getHandValue(cards).hard < 18) {
+        let handValue = getHandValue(cards);
+        while (handValue.soft < 18 && handValue.hard < 17) {
             console.log(cards);
             cards.push(shoe.pop());
+            handValue = getHandValue(cards);
         }
         setDealerCards(cards);
     };
@@ -148,6 +150,7 @@ export const Table = () => {
             justifyContent: 'flex-start',
             alignItems: 'center',
         }}>
+            <Box sx={{ mb: '1rem' }}>{`dealer: ${getHandValue(dealerCards).hard}/${getHandValue(dealerCards).soft}`}</Box>
             <Flex sx={{ mb: '1rem', gap: '1rem' }}>
                 <Box sx={{ height: '2rem' }} onClick={removeSeat} as="button">- Seat</Box>
                 <Box sx={{ height: '2rem' }} as="button" onClick={addSeat}>+ Seat</Box>

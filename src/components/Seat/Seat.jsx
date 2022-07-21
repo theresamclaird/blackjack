@@ -8,7 +8,7 @@ export const Seat = ({ bet, cards, increaseBet, decreaseBet, hit, stand }) => {
             <Box sx={{ position: 'relative', width: '100%', height: '1rem' }}>
                 {cards.map((card, index) => (
                     <React.Fragment key={`player-card-seat-${index}`}>
-                        <Card {...card} sx={{ position: 'absolute', bottom: `${1 + (index * 1.1)}rem`, left: '0.4em' }} />
+                        <Card {...card} sx={{ position: 'absolute', bottom: `${1 + (index * 1.1)}rem` }} />
                     </React.Fragment>
                 ))}
             </Box>
