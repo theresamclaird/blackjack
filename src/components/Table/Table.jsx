@@ -70,7 +70,10 @@ class DealerHand extends Hand {
         this.hide = true;
     }
     get reportHandValue() {
-        if (this.hide) { return this.cards[1].value }
+        if (this.hide) {
+            const card = this.cards[1];
+            return card.value === 1 ? '1/11' : card.value;
+        }
         return super.reportHandValue;
     }
     showHiddenCard() {
