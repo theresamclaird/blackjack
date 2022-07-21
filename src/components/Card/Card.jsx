@@ -401,8 +401,7 @@ export const Card = ({ sx, suit, rank, value, showBack = false }) => {
 
     const Front = () => (
         <Box sx={{
-            px: '0.5rem',
-            width: `4rem`,
+            width: '4rem',
             height: `${4 * 1.4}rem`,
             display: 'grid',
             gridTemplateColumns: 'repeat(6, 1fr)',
@@ -418,9 +417,11 @@ export const Card = ({ sx, suit, rank, value, showBack = false }) => {
 
     const Back = () => (
         <Box sx={{
-            px: '0.5rem',
             width: '4rem',
             height: `${4 * 1.4}rem`,
+            border: 'solid 2px',
+            borderColor: '#6666ff',
+            borderRadius: '0.25em',
             backgroundColor: '#e5e5f7',
             opacity: '0.8',
             backgroundImage: 'linear-gradient(30deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(150deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(30deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(150deg, #444cf7 12%, transparent 12.5%, transparent 87%, #444cf7 87.5%, #444cf7), linear-gradient(60deg, #444cf777 25%, transparent 25.5%, transparent 75%, #444cf777 75%, #444cf777), linear-gradient(60deg, #444cf777 25%, transparent 25.5%, transparent 75%, #444cf777 75%, #444cf777)',

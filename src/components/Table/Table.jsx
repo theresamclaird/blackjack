@@ -167,9 +167,9 @@ export const Table = () => {
             alignItems: 'center',
         }}>
             <Flex sx={{ mb: '1rem', gap: '1rem' }}>
-                <Box sx={{ height: '2rem' }} onClick={removeSeat} as="button">- Seat</Box>
-                <Box sx={{ height: '2rem' }} as="button" onClick={addSeat}>+ Seat</Box>
-                <Box sx={{ height: '2rem' }} as="button" onClick={start}>Deal</Box>
+                <Box onClick={removeSeat} as="button">- Seat</Box>
+                <Box as="button" onClick={addSeat}>+ Seat</Box>
+                <Box as="button" onClick={start}>Deal</Box>
             </Flex>
             <DealerCards hand={dealerHand} sx={{ mb: '20rem' }} />
             <TableText sx={{ width: '100%' }} />
