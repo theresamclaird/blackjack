@@ -2,10 +2,10 @@ import React from 'react';
 import { Flex } from '../Box';
 import { Seat } from './Seat';
 
-const Seats = ({ sx = {}, seats, setSeats, hit, stand }) => {
+const Seats = ({ sx = {}, hands, setHands, hit, stand }) => {
 
-    const increaseBet = seatIndex => setSeats(seats.map((seat, index) => index === seatIndex ? { ...seat, bet: seat.bet + 1 } : seat));
-    const decreaseBet = seatIndex => setSeats(seats.map((seat, index) => index === seatIndex ? { ...seat, bet: seat.bet - 1 } : seat));
+    const increaseBet = handIndex => setHands(hands.map((hand, index) => index === handIndex ? { ...hand, bet: hand.bet + 1 } : hand));
+    const decreaseBet = handIndex => setHands(hands.map((hand, index) => index === handIndex ? { ...hand, bet: hand.bet - 1 } : hand));
 
     return (
         <Flex sx={{ flexDirection: 'row', justifyContent: 'space-between', gap: '5rem', ...sx }}>
@@ -16,14 +16,14 @@ const Seats = ({ sx = {}, seats, setSeats, hit, stand }) => {
                 gap: '4em',
                 mb: 'xxl',
             }}>
-                {seats.map((seat, index) => (
-                    <React.Fragment key={`seat-${index}`}>
+                {hands.map((hand, index) => (
+                    <React.Fragment key={`hand-${index}`}>
                         <Seat
                             hit={() => hit(index)}
                             stand={() => stand(index)}
                             increaseBet={() => increaseBet(index)}
                             decreaseBet={() => decreaseBet(index)}
-                            {...seat}
+                            hand={hand}
                         />
                     </React.Fragment>
                 ))}

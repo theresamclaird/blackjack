@@ -38,96 +38,104 @@ const randomizeArrayElements = (elements = []) => {
         randomizedArray[index] = temp;
     }
     return randomizedArray;
-  };
+};
 
-
-export const Table = () => {
-    const [seats, setSeats] = useState([{ bet: 1, cards: [] }]);
-    const [dealerCards, setDealerCards] = useState([]);
-    const [shoe, setShoe] = useState(createShoe(1));
-
-    const shuffleCards = () => setShoe(randomizeArrayElements(shoe));
-    const burnCard = () => { shoe.pop(); };
-    const cutCards = () => {
-        const percent = Math.random() * 60 + 20; // 80 - 20 percent
-        const location = Math.floor(shoe.length * percent / 100);
-        setShoe([...shoe.slice(location), ...shoe.slice(0, location)]);
-    };
-    const dealCards = () => {
-        const players = [...seats];
-        const dealerHand = [];
-
-        for (let i = 0; i < 2; i++) {
-            players.map(player => player.bet > 0 && player.cards.push(shoe.pop()));
-            dealerHand.push(shoe.pop());
-        }
-        setSeats(players);
-        setDealerCards(dealerHand);
-    };
-    const getHandValue = cards => {
-        const hard = cards.reduce((p, c) => p + c.value, 0);
-        const soft = cards.filter(card => card.value === 1).length ? hard + 10 : hard;
+class Hand {
+    constructor(bet = 0, cards = []) {
+        this.bet = bet;
+        this.cards = cards;
+    }
+    addCard(card) {
+        this.cards.push(card);
+    }
+    get value() {
+        const hard = this.cards.reduce((p, c) => p + c.value, 0);
+        const soft = this.cards.filter(card => card.value === 1).length > 0 ? hard + 10 : hard;
         return {
             hard,
             soft: soft > 21 ? hard : soft,
         };
     };
+    get reportHandValue() {
+        const { hard, soft } = this.value;
+        return hard !== soft ? `${hard}/${soft}` : `${hard}`;
+    }
+}
 
-    const dealerAction = () => {
-        const cards = [...dealerCards];
-        let handValue = getHandValue(cards);
-        while (handValue.soft < 18 && handValue.hard < 17) {
-            cards.push(shoe.pop());
-            handValue = getHandValue(cards);
+class DealerHand extends Hand {
+    constructor(cards = []) {
+        super();
+        this.bet = null;
+        this.cards = cards;
+    }
+}
+
+export const Table = () => {
+    const [playerHands, setPlayerHands] = useState([new Hand(1)]);
+    const [dealerHand, setDealerHand] = useState(new Hand());
+    const [shoe, setShoe] = useState(createShoe(1));
+
+    const shuffleCards = () => setShoe(randomizeArrayElements(shoe));
+    const burnCard = () => shoe.pop();
+    const cutCards = percent => {
+        const location = Math.floor(shoe.length * percent / 100);
+        setShoe([...shoe.slice(location), ...shoe.slice(0, location)]);
+    };
+    const dealCards = () => {
+        const newPlayerHands = playerHands.map(hand => (new Hand(hand.bet)));
+        const newDealerHand = new DealerHand();
+
+        for (let i = 0; i < 2; i++) {
+            newPlayerHands.map(hand => hand.addCard(shoe.pop()));
+            newDealerHand.addCard(shoe.pop());
         }
-        setDealerCards(cards);
+        setPlayerHands(newPlayerHands);
+        setDealerHand(newDealerHand);
+    };
+    const dealerAction = () => {
+        const newHand = new DealerHand(dealerHand.cards);
+        while (newHand.value.soft < 18 && newHand.value.hard < 17) {
+            newHand.addCard(shoe.pop());
+        }
+        setDealerHand(newHand);
     };
 
     const start = () => {
-        if (seats.filter(seat => seat.bet).length < 1) {
-            return;
-        }
+        if (playerHands.filter(hand => hand.bet).length < 1) { return; }
 
-        reset();
         shuffleCards();
-        cutCards();
+        cutCards(Math.random() * 60 + 20); // 80% - 20%
         burnCard();
         dealCards();
     };
 
-    const reset = () => {
-        setSeats([{ bet: 1, cards: [] }]);
-        setDealerCards([]);
-        setShoe(createShoe(1));
-    };
-
     const addSeat = () => {
-        if (seats.length >= configuration.numberOfSeats || dealerCards.length > 0) {
+        if (playerHands.length >= configuration.numberOfSeats || dealerHand.length > 0) {
             return;
         }
-        setSeats([...seats, { bet: 0, cards: [] }]);
+        setPlayerHands([...playerHands, { bet: 0, cards: [] }]);
     };
 
     const removeSeat = () => {
-        if (seats.length < 2 || dealerCards.length > 0) {
+        if (playerHands.length < 2 || dealerHand.length > 0) {
             return;
         }
 
-        const newSeats = [...seats];
+        const newSeats = [...playerHands];
         newSeats.pop();
-        setSeats(newSeats);
+        setPlayerHands(newSeats);
     };
 
     const hit = seatIndex => {
-        const seat = seats[seatIndex];
-        if (seat.cards.length < 2 || seat.bet < 1) {
+        const hand = playerHands[seatIndex];
+        if (hand.cards.length < 2 || hand.bet < 1) {
             return;
         }
 
-        const cards = [...seats[seatIndex].cards, shoe.pop()];
-        setSeats(seats.map((seat, index) => index === seatIndex ? { ...seat, cards } : seat));
+        hand.addCard(shoe.pop());
+        setPlayerHands(playerHands.map((hand, index) => index === seatIndex ? new Hand(hand.bet, hand.cards) : hand));
 
-        if (getHandValue(cards).hard > 21) {
+        if (hand.value.hard > 21) {
             dealerAction();
         }
     };
@@ -149,20 +157,18 @@ export const Table = () => {
             justifyContent: 'flex-start',
             alignItems: 'center',
         }}>
-            <Box sx={{ mb: '1rem' }}>{`dealer: ${getHandValue(dealerCards).hard}/${getHandValue(dealerCards).soft}`}</Box>
             <Flex sx={{ mb: '1rem', gap: '1rem' }}>
                 <Box sx={{ height: '2rem' }} onClick={removeSeat} as="button">- Seat</Box>
                 <Box sx={{ height: '2rem' }} as="button" onClick={addSeat}>+ Seat</Box>
                 <Box sx={{ height: '2rem' }} as="button" onClick={start}>Deal</Box>
-                <Box sx={{ height: '2rem' }} as="button" onClick={reset}>Reset</Box>
             </Flex>
-            <DealerCards cards={dealerCards} sx={{ mb: '20rem' }} />
+            <DealerCards hand={dealerHand} sx={{ mb: '20rem' }} />
             <TableText sx={{ width: '100%' }} />
             <Seats
                 stand={stand}
                 hit={hit}
-                seats={seats}
-                setSeats={setSeats}
+                hands={playerHands}
+                setHands={setPlayerHands}
                 sx={{ mt: '1rem' }}
             />
         </Flex>
