@@ -77,7 +77,6 @@ export const Table = () => {
         const cards = [...dealerCards];
         let handValue = getHandValue(cards);
         while (handValue.soft < 18 && handValue.hard < 17) {
-            console.log(cards);
             cards.push(shoe.pop());
             handValue = getHandValue(cards);
         }
