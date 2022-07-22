@@ -5,109 +5,31 @@ import { Box, Flex } from '../Box';
 import { Seats } from '../Seat';
 import { TableText } from './TableText';
 import { DealerCards } from './DealerCards';
-
-const createDeck = () => {
-    const cards = [];
-    const suits = ['hearts', 'spades', 'diamonds', 'clubs'];
-
-    suits.forEach(suit => {
-        for (let value = 1; value <= 10; value++) {
-            cards.push({ suit, value, rank: value });
-        }
-        cards.push({ suit, value: 10, rank: 'jack' });
-        cards.push({ suit, value: 10, rank: 'queen' });
-        cards.push({ suit, value: 10, rank: 'king' });
-    });
-    return cards;
-};
-
-const createShoe = numberOfDecks => {
-    const cards = [];
-    for (let i = 0; i < numberOfDecks; i++) {
-        cards.push(...createDeck());
-    }
-    return cards;
-};
-
-const randomizeArrayElements = (elements = []) => {
-    const randomizedArray = elements;
-    for (let index = randomizedArray.length - 1; index > 0; index--) {
-        const randomCardLocation = Math.floor(Math.random() * (index + 1));
-        const temp = randomizedArray[randomCardLocation];
-        randomizedArray[randomCardLocation] = randomizedArray[index];
-        randomizedArray[index] = temp;
-    }
-    return randomizedArray;
-};
-
-class Hand {
-    constructor(bet = 0, cards = []) {
-        this.bet = bet;
-        this.cards = cards;
-    }
-    addCard(card) {
-        this.cards.push(card);
-    }
-    get value() {
-        const hard = this.cards.reduce((p, c) => p + c.value, 0);
-        const soft = this.cards.filter(card => card.value === 1).length > 0 ? hard + 10 : hard;
-        return {
-            hard,
-            soft: soft > 21 ? hard : soft,
-        };
-    };
-    get reportHandValue() {
-        const { hard, soft } = this.value;
-        return hard !== soft ? `${hard}/${soft}` : `${hard}`;
-    }
-}
-
-class DealerHand extends Hand {
-    constructor(cards = []) {
-        super();
-        this.bet = null;
-        this.cards = cards;
-        this.hide = true;
-    }
-    get reportHandValue() {
-        if (this.hide) {
-            const card = this.cards[1];
-            return card.value === 1 ? '1/11' : card.value;
-        }
-        return super.reportHandValue;
-    }
-    showHiddenCard() {
-        this.hide = false;
-    }
-}
+import { Hand, DealerHand } from '../../classes/Hand';
+import { Shoe } from '../../classes/Shoe';
 
 export const Table = () => {
     const [playerHands, setPlayerHands] = useState([new Hand(1)]);
     const [dealerHand, setDealerHand] = useState(new Hand());
-    const [shoe, setShoe] = useState(createShoe(1));
+    const [shoe, setShoe] = useState(new Shoe(1));
 
-    const shuffleCards = () => setShoe(randomizeArrayElements(shoe));
-    const burnCard = () => shoe.pop();
-    const cutCards = percent => {
-        const location = Math.floor(shoe.length * percent / 100);
-        setShoe([...shoe.slice(location), ...shoe.slice(0, location)]);
-    };
     const dealCards = () => {
         const newPlayerHands = playerHands.map(hand => (new Hand(hand.bet)));
         const newDealerHand = new DealerHand();
 
         for (let i = 0; i < 2; i++) {
-            newPlayerHands.map(hand => hand.addCard(shoe.pop()));
-            newDealerHand.addCard(shoe.pop());
+            newPlayerHands.map(hand => hand.addCard(shoe.draw));
+            newDealerHand.addCard(shoe.draw);
         }
         setPlayerHands(newPlayerHands);
         setDealerHand(newDealerHand);
     };
+
     const dealerAction = () => {
         const newHand = new DealerHand(dealerHand.cards);
         newHand.showHiddenCard();
         while (newHand.value.soft < 18 && newHand.value.hard < 17) {
-            newHand.addCard(shoe.pop());
+            newHand.addCard(shoe.draw);
         }
         setDealerHand(newHand);
     };
@@ -115,17 +37,13 @@ export const Table = () => {
     const start = () => {
         if (playerHands.filter(hand => hand.bet).length < 1) { return; }
 
-        shuffleCards();
-        cutCards(Math.random() * 60 + 20); // 80% - 20%
-        burnCard();
+        setShoe(shoe.shuffle().cut(Math.random() * 60 + 20).burn());
         dealCards();
     };
 
     const addSeat = () => {
-        if (playerHands.length >= configuration.numberOfSeats || dealerHand.length > 0) {
-            return;
-        }
-        setPlayerHands([...playerHands, { bet: 0, cards: [] }]);
+        if (playerHands.length >= configuration.numberOfSeats || dealerHand.length > 0) { return; }
+        setPlayerHands([...playerHands, new Hand()]);
     };
 
     const removeSeat = () => {
@@ -144,7 +62,7 @@ export const Table = () => {
             return;
         }
 
-        hand.addCard(shoe.pop());
+        hand.addCard(shoe.draw);
         setPlayerHands(playerHands.map((hand, index) => index === seatIndex ? new Hand(hand.bet, hand.cards) : hand));
 
         if (hand.value.hard > 21) {
@@ -154,7 +72,6 @@ export const Table = () => {
 
     const stand = seatIndex => {
         // todo Allow other seats to play their hands.
-        console.log('stand');
         dealerAction();
     };
 
