@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Box, Flex } from '../Box';
 import Shoe from './Shoe';
@@ -11,17 +11,14 @@ import { getRandomNumberInRange } from '../../utils/random';
 export const Game = () => {
     const [state, setState] = useState(() => ({
         shoe: [],
-        player: { bet: 1, cards: [] },
+        player: { bankroll: -1, bet: 1, cards: [] },
         dealer: { reveal: false, cards: [] },
     }));
-
-    useEffect(() => console.log('useEffect'), []);
-    useEffect(() => console.log('state changed', state), [state]);
 
     const deal = () => setState(prev => {
         let { player, dealer, shoe } = { ...prev };
 
-        if (shoe.length < 52 / 2) {
+        if (shoe.length < 52) { // todo If configuration.numberOfDecks > 1, set a cut card.
             shoe = createShoe(1);
             shoe = shuffleCards(shoe);
             shoe = cutCards(shoe, getRandomNumberInRange(20, 80)); // 20-80%
@@ -29,7 +26,10 @@ export const Game = () => {
         }
 
         player.cards = [];
-        dealer.cards = [];
+        dealer = {
+            reveal: false,
+            cards: [],
+        };
 
         for (let i = 0; i < 2; i++) {
             player.cards.push(shoe.pop());
@@ -38,12 +38,70 @@ export const Game = () => {
         return { ...prev, player, dealer, shoe };
     });
 
+    const calculateHandValue = cards => {
+        const hard = cards.reduce((sum, card) => sum + card.value, 0);
+        const soft = cards.filter(card => card.value === 1).length > 0 ? hard + 10 : hard;
+        return {
+            hard,
+            soft: soft > 21 ? hard : soft,
+        };
+    };
+
+    const playDealerHand = (dealer, shoe) => {
+        const { cards } = dealer;
+        dealer.reveal = true;
+        const shouldDraw = cards => {
+            const { soft, hard } = calculateHandValue(cards);
+            return soft < 18 && hard < 17;
+        };
+
+        while (shouldDraw(cards)) { cards.push(shoe.pop()); }
+    };
+
+    const isBusted = cards => {
+        const { hard } = calculateHandValue(cards);
+        return (hard > 21);
+    };
+
     const hit = () => setState(prev => {
-        let { player, shoe } = { ...prev };
-        const cards = [...player.cards];
+        const shoe = [...prev.shoe];
+        const cards = [...prev.player.cards];
+        let bankroll = prev.player.bankroll;
+        let reveal = prev.dealer.reveal;
+
         cards.push(shoe.pop());
-        return { ...prev, player: { ...player, cards }, shoe };
+
+        if (isBusted(cards)) {
+            console.log('player busted');
+            reveal = true;
+            bankroll = bankroll - 1;
+        }
+
+        return {
+            ...prev,
+            dealer: { ...prev.dealer, reveal },
+            player: { ...prev.player, bankroll, cards },
+            shoe,
+        };
     });
+
+    const stand = () => {
+        setState(prev => {
+            const cards = [...prev.dealer.cards];
+            const dealer = {...prev.dealer};
+            const shoe = [...prev.shoe];
+            dealer.reveal = true;
+
+            const shouldDraw = cards => {
+                const { soft, hard } = calculateHandValue(cards);
+                return soft < 18 && hard < 17;
+            };
+
+            while (shouldDraw(cards)) { cards.push(shoe.pop()); }
+
+            return { ...prev, dealer: { ...dealer, cards }, shoe };
+        });
+    };
 
     return (
         <Flex sx={{
@@ -59,12 +117,12 @@ export const Game = () => {
                 <Shoe cards={state.shoe} />
                 <Box as="button" onClick={deal}>Deal</Box>
             </Flex>
-            <Dealer {...state.dealer} sx={{ mb: '5rem' }} />
-            <Table sx={{ width: '100%' }} />
+            <Dealer {...state.dealer} />
+            <Table sx={{ width: '100%', height: '10rem' }} />
             <Player
                 hit={hit}
+                stand={stand}
                 {...state.player}
-                sx={{ mt: '1rem' }}
             />
         </Flex>
     );

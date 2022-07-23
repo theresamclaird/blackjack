@@ -1,13 +1,20 @@
 import React from 'react';
 import Box, { Flex } from '../Box';
+import { Text } from '../Text';
 import Card from './Card';
 
-const Player = ({ bet, cards, hit = () => null, stand = () => null }) => (
-    <Flex sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', }}>
+const Player = ({ bankroll, bet, cards, hit, stand }) => (
+    <Flex sx={{
+        mt: '3rem',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '1em',
+    }}>
         <Box sx={{ position: 'relative', width: '100%' }}>
             {cards.map((card, index) => (
                 <React.Fragment key={`player-card-seat-${index}`}>
-                    <Card {...card} sx={{ position: 'absolute', bottom: `${index * 1.1}rem` }} />
+                    <Card {...card} sx={{ position: 'absolute', left: `${index + 1}rem`, bottom: `${index * 1.1}rem` }} />
                 </React.Fragment>
             ))}
         </Box>
@@ -31,7 +38,7 @@ const Player = ({ bet, cards, hit = () => null, stand = () => null }) => (
                 </Flex>
             </Flex>
         </Box>
-        <Flex sx={{ mt: 'lg', flexDirection: 'column', justifyContent: 'center' }}>
+        <Flex sx={{ flexDirection: 'column', justifyContent: 'center' }}>
             <Box>
                 <Box onClick={hit} sx={{ width: '50%' }} as="button">Hit</Box>
                 <Box onClick={stand} sx={{ width: '50%' }} as="button">Stand</Box>
@@ -44,6 +51,7 @@ const Player = ({ bet, cards, hit = () => null, stand = () => null }) => (
                 <Box sx={{ width: '100%' }} as="button">Surrender</Box>
             </Box>
         </Flex>
+        <Text sx={{ color: 'yellow' }}>{`Bankroll: ¤${bankroll}`}</Text>
     </Flex>
 );
 
