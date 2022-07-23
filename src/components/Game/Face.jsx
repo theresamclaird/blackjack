@@ -2,18 +2,18 @@ import React from 'react';
 import { Box, Flex } from '../Box';
 import Pip from './Pip';
 
-import jackHearts from './faces/jack-hearts.svg';
-import queenHearts from './faces/queen-hearts.svg';
-import kingHearts from './faces/king-hearts.svg';
-import jackSpades from './faces/jack-spades.svg';
-import queenSpades from './faces/queen-spades.svg';
-import kingSpades from './faces/king-spades.svg';
-import jackDiamonds from './faces/jack-diamonds.svg';
-import queenDiamonds from './faces/queen-diamonds.svg';
-import kingDiamonds from './faces/king-diamonds.svg';
-import jackClubs from './faces/jack-clubs.svg';
-import queenClubs from './faces/queen-clubs.svg';
-import kingClubs from './faces/king-clubs.svg';
+import jackHearts from '../../images/jack-hearts.svg'
+import queenHearts from '../../images/queen-hearts.svg';
+import kingHearts from '../../images/king-hearts.svg';
+import jackSpades from '../../images/jack-spades.svg';
+import queenSpades from '../../images/queen-spades.svg';
+import kingSpades from '../../images/king-spades.svg';
+import jackDiamonds from '../../images/jack-diamonds.svg';
+import queenDiamonds from '../../images/queen-diamonds.svg';
+import kingDiamonds from '../../images/king-diamonds.svg';
+import jackClubs from '../../images/jack-clubs.svg';
+import queenClubs from '../../images/queen-clubs.svg';
+import kingClubs from '../../images/king-clubs.svg';
 
 const Face = ({ rank, suit, pip, color }) => {
     const imageSrc = {

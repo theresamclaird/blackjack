@@ -2,7 +2,7 @@ import React from 'react';
 import { Flex } from '../Box';
 import { Text } from '../Text';
 
-const TableText = ({ sx = {} }) => {
+const Table = ({ sx = {} }) => {
     const commonTextStyle = {
         color: 'yellow',
         textTransform: 'uppercase',
@@ -31,4 +31,4 @@ const TableText = ({ sx = {} }) => {
     );
 };
 
-export { TableText, TableText as default };
+export default Table;

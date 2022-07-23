@@ -21,15 +21,20 @@ const createShoe = numberOfDecks => {
     return cards;
 };
 
-const shuffle = (elements = []) => {
-    const randomizedArray = elements;
-    for (let index = randomizedArray.length - 1; index > 0; index--) {
-        const randomCardLocation = Math.floor(Math.random() * (index + 1));
-        const temp = randomizedArray[randomCardLocation];
-        randomizedArray[randomCardLocation] = randomizedArray[index];
-        randomizedArray[index] = temp;
+const shuffleCards = (cards = []) => {
+    const shuffledCards = [...cards];
+    for (let index = shuffledCards.length - 1; index > 0; index--) {
+        const randomCardIndex = Math.floor(Math.random() * (index + 1));
+        const temp = shuffledCards[randomCardIndex];
+        shuffledCards[randomCardIndex] = shuffledCards[index];
+        shuffledCards[index] = temp;
     }
-    return randomizedArray;
+    return shuffledCards;
 };
 
-export { createDeck, createShoe, shuffle };
+const cutCards = (cards = [], percent) => {
+    const location = Math.floor(cards.length * percent / 100);
+    return [...cards.slice(location), ...cards.slice(0, location)];
+}
+
+export { createDeck, createShoe, shuffleCards, cutCards };
