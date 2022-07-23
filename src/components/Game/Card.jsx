@@ -4,7 +4,7 @@ import Pip from './Pip';
 import Corner from './Corner';
 import Face from './Face';
 
-const Card = ({ sx, suit, rank, value, showBack = false }) => {
+const Card = ({ sx = {}, suit, rank, value, showBack = false }) => {
     const pip = { hearts: '♥', diamonds: '♦️', clubs: '♣️', spades: '♠' }[suit];
     const color = suit === 'hearts' || suit === 'diamonds' ? 'red' : 'black';
 

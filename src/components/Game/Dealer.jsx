@@ -2,16 +2,18 @@ import  React from 'react';
 import Box, { Flex } from '../Box';
 import { Text } from '../Text';
 import Card from './Card';
+import HandValue from './HandValue';
 
-const Dealer = ({ sx = {}, bank, reveal, cards = [] }) => (
-    <>
-        <Text sx={{ color: 'yellow' }}>{`Bank: ¤${bank}`}</Text>
+const Dealer = ({ sx = {}, handValue, bank, reveal, cards = [], offerInsurance }) => (
+    <Flex sx={{ flexDirection: 'column', alignItems: 'center', gap: '0.5rem', width: '100%' }}>
+        <Text sx={{ color: 'yellow' }}>{`Bank: ¤ ${bank}`}</Text>
         <Box sx={{
-            minWidth: '14rem',
+            width: '100%',
             minHeight: '9rem',
             border: 'solid 2px',
+            borderLeft: 0,
+            borderRight: 0,
             borderColor: 'white',
-            borderRadius: '0.5rem',
             boxShadow: 'inset 0 0 3rem #003300',
             p: '1rem',
             ...sx,
@@ -24,7 +26,8 @@ const Dealer = ({ sx = {}, bank, reveal, cards = [] }) => (
                 {cards.map((card, index) => <React.Fragment key={`dealer-card-${index}`}><Card showBack={!reveal && index === 0} {...card} /></React.Fragment>)}
             </Flex>
         </Box>
-    </>
+        {reveal ? <HandValue label="Dealer" {...handValue} /> : <Text sx={{ color: 'white' }}>{offerInsurance? 'Insurance?' : '♠ ♥ ♣️ ♦️'}</Text>}
+    </Flex>
 );
 
 export default Dealer;

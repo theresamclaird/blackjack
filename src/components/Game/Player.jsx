@@ -2,14 +2,31 @@ import React from 'react';
 import Box, { Flex } from '../Box';
 import { Text } from '../Text';
 import Card from './Card';
+import HandValue from './HandValue';
 
-const Player = ({ bankroll, bet, cards, hit, stand }) => (
+const Player = ({
+    sx = {},
+    handValue,
+    bankroll,
+    bet,
+    cards,
+    incrementBet,
+    decrementBet,
+    hit,
+    stand,
+    surrender,
+    double,
+    acceptInsurance,
+    declineInsurance,
+    offerInsurance,
+}) => (
     <Flex sx={{
         mt: '3rem',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         gap: '1em',
+        ...sx,
     }}>
         <Box sx={{ position: 'relative', width: '100%' }}>
             {cards.map((card, index) => (
@@ -18,6 +35,7 @@ const Player = ({ bankroll, bet, cards, hit, stand }) => (
                 </React.Fragment>
             ))}
         </Box>
+        <HandValue label="Player" {...handValue} />
         <Box sx={{
             border: 'solid 2px',
             borderColor: 'white',
@@ -38,20 +56,27 @@ const Player = ({ bankroll, bet, cards, hit, stand }) => (
                 </Flex>
             </Flex>
         </Box>
-        <Flex sx={{ flexDirection: 'column', justifyContent: 'center' }}>
-            <Box>
-                <Box onClick={hit} sx={{ width: '50%' }} as="button">Hit</Box>
-                <Box onClick={stand} sx={{ width: '50%' }} as="button">Stand</Box>
-            </Box>
-            <Box>
-                <Box as="button">Split</Box>
-                <Box as="button">Double</Box>
-            </Box>
-            <Box>
-                <Box sx={{ width: '100%' }} as="button">Surrender</Box>
-            </Box>
+        <Flex sx={{ flexDirection: 'column', justifyContent: 'center', gap: '1rem' }}>
+            <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '1rem' }}>
+                <Box onClick={decrementBet} as="button">- Bet</Box>
+                <Box onClick={incrementBet} as="button">+ Bet</Box>
+            </Flex>
+            {offerInsurance && (
+                <Flex sx={{ flexDirection: 'row', gap: '1rem' }}>
+                    <Box onClick={acceptInsurance} as="button">Accept</Box>
+                    <Box onClick={declineInsurance} as="button">Decline</Box>
+                </Flex>
+            )}
+            <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '1rem' }}>
+                <Box onClick={double} as="button">Double</Box>
+                <Box onClick={surrender} as="button">Surrender</Box>
+            </Flex>
         </Flex>
-        <Text sx={{ color: 'yellow' }}>{`Bankroll: ¤${bankroll}`}</Text>
+        <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '1rem' }}>
+                <Box onClick={hit} as="button">Hit</Box>
+                <Box onClick={stand} as="button">Stand</Box>
+            </Flex>
+        <Text sx={{ color: 'yellow' }}>{`Bankroll: ¤ ${bankroll}`}</Text>
     </Flex>
 );
 
