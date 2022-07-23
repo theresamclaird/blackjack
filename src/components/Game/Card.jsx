@@ -401,6 +401,7 @@ const Card = ({ sx, suit, rank, value, showBack = false }) => {
 
     const Front = () => (
         <Box sx={{
+            px: '0.5rem',
             width: '4rem',
             height: `${4 * 1.4}rem`,
             display: 'grid',

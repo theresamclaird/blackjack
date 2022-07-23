@@ -12,11 +12,13 @@ export const Game = () => {
     const [state, setState] = useState(() => ({
         shoe: [],
         player: { bankroll: -1, bet: 1, cards: [] },
-        dealer: { reveal: false, cards: [] },
+        dealer: { bank: 0, reveal: false, cards: [] },
     }));
 
     const deal = () => setState(prev => {
-        let { player, dealer, shoe } = { ...prev };
+        let shoe = [...prev.shoe];
+        let player = { ...prev.player };
+        let dealer = { ...prev.dealer };
 
         if (shoe.length < 52) { // todo If configuration.numberOfDecks > 1, set a cut card.
             shoe = createShoe(1);
@@ -26,10 +28,8 @@ export const Game = () => {
         }
 
         player.cards = [];
-        dealer = {
-            reveal: false,
-            cards: [],
-        };
+        dealer.cards = [];
+        dealer.reveal = false;
 
         for (let i = 0; i < 2; i++) {
             player.cards.push(shoe.pop());
@@ -47,50 +47,37 @@ export const Game = () => {
         };
     };
 
-    const playDealerHand = (dealer, shoe) => {
-        const { cards } = dealer;
-        dealer.reveal = true;
-        const shouldDraw = cards => {
-            const { soft, hard } = calculateHandValue(cards);
-            return soft < 18 && hard < 17;
-        };
-
-        while (shouldDraw(cards)) { cards.push(shoe.pop()); }
-    };
-
     const isBusted = cards => {
         const { hard } = calculateHandValue(cards);
         return (hard > 21);
     };
 
     const hit = () => setState(prev => {
-        const shoe = [...prev.shoe];
-        const cards = [...prev.player.cards];
-        let bankroll = prev.player.bankroll;
-        let reveal = prev.dealer.reveal;
+        let shoe = [...prev.shoe];
+        let cards = [...prev.player.cards];
 
         cards.push(shoe.pop());
 
         if (isBusted(cards)) {
             console.log('player busted');
-            reveal = true;
-            bankroll = bankroll - 1;
+            const bet = prev.player.bet;
+            return {
+                ...prev,
+                dealer: { ...prev.dealer, reveal: true, bank: prev.dealer.bank + bet },
+                player: { ...prev.player, cards: [], bankroll: prev.player.bankroll - bet },
+                shoe,
+            };
         }
 
-        return {
-            ...prev,
-            dealer: { ...prev.dealer, reveal },
-            player: { ...prev.player, bankroll, cards },
-            shoe,
-        };
+        return { ...prev, player: { ...prev.player, cards }, shoe };
     });
 
     const stand = () => {
         setState(prev => {
-            const cards = [...prev.dealer.cards];
-            const dealer = {...prev.dealer};
-            const shoe = [...prev.shoe];
-            dealer.reveal = true;
+            let shoe = [...prev.shoe];
+            let cards = [...prev.dealer.cards];
+            let bankroll = prev.player.bankroll;
+            let bank = prev.dealer.bank;
 
             const shouldDraw = cards => {
                 const { soft, hard } = calculateHandValue(cards);
@@ -99,7 +86,34 @@ export const Game = () => {
 
             while (shouldDraw(cards)) { cards.push(shoe.pop()); }
 
-            return { ...prev, dealer: { ...dealer, cards }, shoe };
+            const dealerHandValue = calculateHandValue(cards);
+            const bet = prev.player.bet;
+            if (dealerHandValue.hard > 21) {
+                console.log('dealer busted; player won');
+                bankroll += bet;
+                bank -= bet;
+            } else {
+                // todo Refactor this nightmare.
+                const playerHandValue = calculateHandValue(prev.player.cards);
+                if (dealerHandValue.hard > playerHandValue.hard) {
+                    console.log('player lost');
+                    bankroll -= bet;
+                    bank += bet;
+                } else if (dealerHandValue.hard < playerHandValue.hard) {
+                    console.log('player won')
+                    bankroll += bet;
+                    bank -= bet;
+                } else {
+                    console.log('player pushes');
+                }
+            }
+
+            return {
+                ...prev,
+                dealer: { ...prev.dealer, reveal: true, cards, bank },
+                player: { ...prev.player, bankroll },
+                shoe,
+            };
         });
     };
 
