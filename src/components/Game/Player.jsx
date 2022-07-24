@@ -35,7 +35,7 @@ const Player = ({
                 </React.Fragment>
             ))}
         </Box>
-        <HandValue label="Player" {...handValue} />
+        <HandValue label="Player" value={handValue} />
         <Box sx={{
             border: 'solid 2px',
             borderColor: 'white',
@@ -62,7 +62,7 @@ const Player = ({
                 <Box onClick={incrementBet} as="button">+ Bet</Box>
             </Flex>
             {offerInsurance && (
-                <Flex sx={{ flexDirection: 'row', gap: '1rem' }}>
+                <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '1rem' }}>
                     <Box onClick={acceptInsurance} as="button">Accept</Box>
                     <Box onClick={declineInsurance} as="button">Decline</Box>
                 </Flex>
@@ -70,12 +70,10 @@ const Player = ({
             <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '1rem' }}>
                 <Box onClick={double} as="button">Double</Box>
                 <Box onClick={surrender} as="button">Surrender</Box>
-            </Flex>
-        </Flex>
-        <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '1rem' }}>
                 <Box onClick={hit} as="button">Hit</Box>
                 <Box onClick={stand} as="button">Stand</Box>
             </Flex>
+        </Flex>
         <Text sx={{ color: 'yellow' }}>{`Bankroll: ¤ ${bankroll}`}</Text>
     </Flex>
 );

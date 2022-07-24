@@ -11,11 +11,28 @@ import { getRandomNumberInRange } from '../../utils/random';
 export const Game = () => {
     const [state, setState] = useState(() => ({
         shoe: [],
-        player: { bankroll: -1, bet: 1, cards: [] },
+        player: { bankroll: 0, bet: 0, cards: [], insuranceBet: 0, isResolved: false },
         dealer: { bank: 0, reveal: false, cards: [], offerInsurance: false },
+        configuration: {
+            numberOfDecks: 1,
+            penetration: 66,
+            cutRange: { min: 20, max: 80 },
+            dealerPeek: true,
+            dealerHitsSoft17: true,
+            doubleAfterSplit: true,
+            surrender: 'late', // Can be false, 'early', or 'late'.
+            double: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+            blackjackPays: 3 / 2,
+            surrenderCost: 1 / 2,
+            insuranceCost: 1 / 2,
+        },
     }));
 
-    const incrementBet = () => setState(previousState => ({
+    if (state.dealer.bank + state.player.bankroll + state.player.bet !== 0) {
+        console.error('Accounting error.', { bank: state.dealer.bank, bankroll: state.player.bankroll, bet: state.player.bet });
+    }
+
+    const playerIncrementBet = () => setState(previousState => ({
         ...previousState,
         player: {
             ...previousState.player,
@@ -24,7 +41,7 @@ export const Game = () => {
         },
     }));
 
-    const decrementBet = () => {
+    const playerDecrementBet = () => {
         if (state.player.bet < 1) {
             return;
         }
@@ -39,14 +56,84 @@ export const Game = () => {
         }));
     };
 
-    const calculateHandValue = cards => {
-        const hard = cards.reduce((sum, card) => sum + card.value, 0);
-        const soft = cards.filter(card => card.value === 1).length > 0 ? hard + 10 : hard;
-        return {
-            hard,
-            soft: soft > 21 ? hard : soft,
-        };
+    const playerBetsInsurance = player => {
+        const { insuranceCost } = state.configuration;
+        const amount = player.bet * insuranceCost;
+        player.bankroll -= amount;
+        player.insuranceBet += amount;
     };
+
+    const playerWinInsurance = (player, dealer) => {
+        dealer.bank -= player.insuranceBet;
+        player.bankroll += player.insuranceBet; // Player gets the amount won.
+        player.bankroll += player.insuranceBet; // Player takes back their original bet.
+        player.insuranceBet = 0;
+    };
+
+    const playerLoseInsurance = (player, dealer) => {
+        dealer.bank += player.insuranceBet;
+        player.insuranceBet = 0;
+    };
+
+    const playerPush = player => player.isResolved = true;
+
+    const playerLoseBet = (player, dealer) => {
+        dealer.reveal = true;
+        dealer.bank += player.bet;
+        player.bet = 0;
+        player.isResolved = true;
+    };
+
+    const playerWinBet = (player, dealer) => {
+        dealer.bank -= player.bet;
+        player.bankroll += player.bet;
+        player.isResolved = true;
+    };
+
+    const playerWinBlackjack = (player, dealer) => {
+        dealer.reveal = true;
+        const { blackjackPays } = state.configuration;
+        const amount = player.bet * blackjackPays;
+        dealer.bank -= amount;
+        player.bankroll += amount;
+        player.isResolved = true;
+    };
+
+    const playerSurrender = (player, dealer) => {
+        const { surrenderCost } = state.configuration;
+        const amount = player.bet * surrenderCost;
+        dealer.bank += amount;
+        player.bankroll += player.bet - amount;
+        player.bet = 0;
+        player.isResolved = true;
+    };
+
+    const playerDoubleBet = player => {
+        const amount = player.bet;
+        player.bankroll -= amount;
+        player.bet += amount;
+        player.isResolved = true;
+    };
+
+    const handValue = cards => {
+        const sum = cards.reduce((sum, card) => sum + card.value, 0); // Aces are counted as 1.
+
+        if (sum > 11) {
+            return sum;
+        }
+
+        if (cards.filter(card => card.value === 1).length > 0) { // Hand contains >= 1 Ace.
+            return sum + 10;
+        }
+        
+        return sum;
+    };
+
+    const isSoft = cards => cards.reduce((sum, card) => sum + card.value, 0) < 12 && cards.filter(card => card.value === 1).length > 0;
+
+    const isBlackjack = cards => cards.length === 2 && handValue(cards) === 21;
+
+    const isBusted = cards => handValue(cards) > 21;
 
     const deal = () => {
         if (state.player.bet < 1) {
@@ -54,14 +141,16 @@ export const Game = () => {
         }
 
         return setState(previousState => {
+            let player = { ...previousState.player, cards: [], isResolved: false };
+            let dealer = { ...previousState.dealer, cards: [], reveal: false, offerInsurance: false, };
             let shoe = [ ...previousState.shoe ];
-            let player = { ...previousState.player, cards: [] };
-            let dealer = { ...previousState.dealer, cards: [], reveal: false };
 
-            if (shoe.length < 52 / 3) { // todo Add configuration for penetration.
-                shoe = createShoe(1);
+            const { numberOfDecks, penetration, cutRange } = state.configuration;
+
+            if (shoe.length < 52 * numberOfDecks * (100 - penetration) / 100) {
+                shoe = createShoe(numberOfDecks);
                 shoe = shuffleCards(shoe);
-                shoe = cutCards(shoe, getRandomNumberInRange(20, 80)); // todo Add configuration for cut range.
+                shoe = cutCards(shoe, getRandomNumberInRange(cutRange.min, cutRange.max));
                 shoe.pop(); // burn
             }
 
@@ -70,149 +159,165 @@ export const Game = () => {
                 dealer.cards.push(shoe.pop());
             }
 
-            // todo Insurance if the dealer is showing an Ace.
-            if (dealer.cards[1].value === 1) {
-                console.log('dealer is showing an ace');
+            if (dealer.cards[1].value === 1) { // Dealer is showing an Ace.
                 dealer.offerInsurance = true;
                 return { ...previousState, player, dealer, shoe }; // todo Left off here.
             }
 
-            const playerHandValue = calculateHandValue(player.cards);
-            const dealerHandValue = calculateHandValue(dealer.cards);
+            const playerHasBlackjack = isBlackjack(player.cards);
 
-            if (dealerHandValue.soft === 21) {
-                console.log('dealer has a blackjack');
+            if (isBlackjack(dealer.cards)) {
                 dealer.reveal = true;
-                if (playerHandValue.soft < 21) {
-                    console.log('player loses');
-                    player.bet = 0;
-                    dealer.bank += player.bet;
 
+                if (playerHasBlackjack) { // push
+                    playerPush(player);
                     return { ...previousState, player, dealer, shoe };
                 }
-                
-                console.log('player also has a blackjack and pushes');
+
+                playerLoseBet(player, dealer);
                 return { ...previousState, player, dealer, shoe };
             }
 
-            if (playerHandValue.soft === 21) {
-                console.log('player has a blackjack');
-                dealer.reveal = true;
-                const amount = player.bet * 3 / 2;
-                player.bankroll += amount;
-                dealer.bank -= amount;
+            if (playerHasBlackjack) { // The player has a blackjack.
+                playerWinBlackjack(player, dealer);
             }
 
             return { ...previousState, player, dealer, shoe };
         });
     };
 
-    const playerBust = (player, dealer) => {
-        dealer.reveal = true;
-        dealer.bank += player.bet;
-        player.bet = 0;
-    };
+    const playDealerHand = (dealer, shoe) => {
+        const cards = dealer.cards;
 
-    const playDealerHand = (cards, shoe) => {
-        const shouldDraw = cards => {
-            const { soft, hard } = calculateHandValue(cards);
-            return soft < 18 && hard < 17;
+        const dealerMustHit = cards => {
+            const dealerHandValue = handValue(cards);
+            const { dealerHitsSoft17 } = state.configuration;
+
+            return dealerHitsSoft17 && isSoft(cards) ? dealerHandValue < 18 : dealerHandValue < 17;
         };
 
-        while (shouldDraw(cards)) { cards.push(shoe.pop()); }
+        while (dealerMustHit(cards)) { cards.push(shoe.pop()); }
     };
 
-    const determineWinner = (player, dealer) => {
-        const dealerHandValue = calculateHandValue(dealer.cards);
-        if (dealerHandValue.hard > 21) {
-            console.log('dealer busted; player won');
-            dealer.bank -= player.bet;
-            player.bankroll += player.bet;
-        } else {
-            const playerHandValue = calculateHandValue(player.cards);
-            if (dealerHandValue.soft > playerHandValue.soft) {
-                console.log('player lost');
-                dealer.bank += player.bet;
-                player.bet = 0;
-            } else if (dealerHandValue.hard < playerHandValue.hard) {
-                console.log('player won')
-                dealer.bank -= player.bet;
-                player.bankroll += player.bet;
-            } else {
-                console.log('player pushes');
-            }
+    const resolveHand = (player, dealer) => {
+        if (player.bet < 1 || player.resolveHand) { // todo Is this redundant?
+            return;
+        }
+
+        if (isBusted(dealer.cards)) {
+            playerWinBet(player, dealer);
+            return;
+        }
+
+        const playerHandValue = handValue(player.cards);
+        const dealerHandValue = handValue(dealer.cards);
+
+        if (playerHandValue > dealerHandValue) {
+            playerWinBet(player, dealer);
+            return;
+        }
+
+        if (playerHandValue < dealerHandValue) {
+            playerLoseBet(player, dealer);
+            return;
         }
     };
 
     const hit = () => setState(previousState => {
-        let shoe = [...previousState.shoe];
         let player = {...previousState.player, cards: [...previousState.player.cards]};
         let dealer = {...previousState.dealer, cards: [...previousState.dealer.cards]};
+        let shoe = [...previousState.shoe];
 
         player.cards.push(shoe.pop());
 
-        const { hard } = calculateHandValue(player.cards);
-        if (hard > 21) {
-            console.log('player busted');
-            playerBust(player, dealer);
+        if (isBusted(player.cards)) { // Player busted.
+            playerLoseBet(player, dealer);
         }
 
         return { ...previousState, player, dealer, shoe };
     });
 
     const stand = () => setState(previousState => {
-        let shoe = [ ...previousState.shoe ];
         let player = { ...previousState.player, cards: [...previousState.player.cards] };
         let dealer = { ...previousState.dealer, cards: [...previousState.dealer.cards], reveal: true };
+        let shoe = [ ...previousState.shoe ];
 
-        playDealerHand(dealer.cards, shoe);
-        determineWinner(player, dealer);
+        playDealerHand(dealer, shoe);
+        resolveHand(player, dealer);
 
         return { ...previousState, dealer, player, shoe };
     });
 
     const surrender = () => setState(previousState => {
-        let player = { ...previousState.player, cards: [] };
+        let player = { ...previousState.player };
         let dealer = { ...previousState.dealer, reveal: true };
 
-        const amount = player.bet / 2;
-        dealer.bank += amount;
-        player.bankroll += amount;
-        player.bet = 0;
+        playerSurrender(player, dealer);
 
         return { ...previousState, player, dealer };
     });
 
     const double = () => setState(previousState => {
-        let shoe = [ ...previousState.shoe ];
         let player = { ...previousState.player, cards: [...previousState.player.cards] };
         let dealer = { ...previousState.dealer, cards: [...previousState.dealer.cards], reveal: true };
+        let shoe = [ ...previousState.shoe ];
 
-        player.bankroll -= player.bet;
-        player.bet += player.bet;
+        playerDoubleBet(player);
+
         player.cards.push(shoe.pop());
 
-        const { hard } = calculateHandValue(player.cards);
-        if (hard > 21) {
-            console.log('player busted');
-            playerBust(player, dealer);
+        if (isBusted(player.cards)) {
+            playerLoseBet(player, dealer);
             return { ...previousState, player, dealer, shoe };
         }
 
-        playDealerHand(dealer.cards, shoe);
-        determineWinner(player, dealer);
+        playDealerHand(dealer, shoe);
+        resolveHand(player, dealer);
 
         return { ...previousState, player, dealer, shoe };
     });
 
     const acceptInsurance = () => setState(previousState => {
-        console.log('player accepts insurance');
-        return { ...previousState };
+        const player = { ...previousState.player, cards: [...previousState.player.cards] };
+        const dealer = { ...previousState.dealer, cards: [...previousState.dealer.cards], offerInsurance: false };
+
+        playerBetsInsurance(player);
+
+        if (isBlackjack(dealer.cards)) {
+            dealer.reveal = true;
+            playerWinInsurance(player, dealer);
+
+            if (isBlackjack(player.cards)) {
+                playerPush(player);
+                return { ...previousState, dealer, player };
+            }
+
+            playerLoseBet(player, dealer);
+            return { ...previousState, dealer, player };
+        }
+
+        playerLoseInsurance(player, dealer);
+
+        return { ...previousState, dealer, player };
     });
 
     const declineInsurance = () => setState(previousState => {
-        console.log('player declines insurance');
-        return { ...previousState };
+        const player = { ...previousState.player, cards: [...previousState.player.cards] };
+        const dealer = { ...previousState.dealer, cards: [...previousState.dealer.cards], offerInsurance: false };
+
+        if (isBlackjack(dealer.cards)) {
+            dealer.reveal = true;
+
+            if (isBlackjack(player.cards)) { // push
+                playerPush(player);
+                return { ...previousState, dealer, player };
+            }
+
+            playerLoseBet(player, dealer);
+            return { ...previousState, dealer, player };
+        }
+
+        return { ...previousState, dealer, player };
     });
 
     return (
@@ -224,20 +329,19 @@ export const Game = () => {
             justifyContent: 'flex-start',
             alignItems: 'center',
         }}>
-            <Flex sx={{ m: '1rem', px: '1rem', width: '100%', justifyContent: 'space-between' }}>
+            <Flex sx={{ m: '1rem', px: '1rem', width: '100%', justifyContent: 'flex-start' }}>
                 <Shoe cards={state.shoe} />
-                <Box as="button" onClick={deal}>Deal</Box>
             </Flex>
             <Dealer
-                handValue={calculateHandValue(state.dealer.cards)}
+                handValue={handValue(state.dealer.cards)}
                 {...state.dealer}
             />
-            <Table sx={{ px: '1rem', width: '100%', height: '10rem' }} />
+            <Table sx={{ px: '1rem', width: '100%', height: '10rem' }} insuranceBet={state.player.insuranceBet} />
             <Player
                 sx={{ px: '1rem' }}
-                handValue={calculateHandValue(state.player.cards)}
-                incrementBet={incrementBet}
-                decrementBet={decrementBet}
+                handValue={handValue(state.player.cards)}
+                incrementBet={playerIncrementBet}
+                decrementBet={playerDecrementBet}
                 hit={hit}
                 stand={stand}
                 surrender={surrender}
@@ -247,6 +351,9 @@ export const Game = () => {
                 offerInsurance={state.dealer.offerInsurance}
                 {...state.player}
             />
+            <Flex sx={{ m: '1rem', px: '1rem', width: '100%', justifyContent: 'center' }}>
+                <Box as="button" onClick={deal}>Deal</Box>
+            </Flex>
         </Flex>
     );
 };

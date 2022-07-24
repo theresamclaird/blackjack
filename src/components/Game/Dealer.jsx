@@ -26,7 +26,7 @@ const Dealer = ({ sx = {}, handValue, bank, reveal, cards = [], offerInsurance }
                 {cards.map((card, index) => <React.Fragment key={`dealer-card-${index}`}><Card showBack={!reveal && index === 0} {...card} /></React.Fragment>)}
             </Flex>
         </Box>
-        {reveal ? <HandValue label="Dealer" {...handValue} /> : <Text sx={{ color: 'white' }}>{offerInsurance? 'Insurance?' : '♠ ♥ ♣️ ♦️'}</Text>}
+        {reveal ? <HandValue label="Dealer" value={handValue} /> : <Text sx={{ color: 'white' }}>{offerInsurance? 'Insurance?' : '♠ ♥ ♣️ ♦️'}</Text>}
     </Flex>
 );
 
