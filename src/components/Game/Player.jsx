@@ -10,15 +10,18 @@ const Player = ({
     bankroll,
     bet,
     cards,
+    play,
     incrementBet,
     decrementBet,
     hit,
     stand,
     surrender,
     double,
-    acceptInsurance,
+    split,
+    placeInsuranceBet,
     declineInsurance,
     offerInsurance,
+    isResolved,
 }) => (
     <Flex sx={{
         mt: '3rem',
@@ -35,7 +38,7 @@ const Player = ({
                 </React.Fragment>
             ))}
         </Box>
-        <HandValue label="Player" value={handValue} />
+        <HandValue value={handValue} />
         <Box sx={{
             border: 'solid 2px',
             borderColor: 'white',
@@ -58,20 +61,38 @@ const Player = ({
         </Box>
         <Flex sx={{ flexDirection: 'column', justifyContent: 'center', gap: '1rem' }}>
             <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '1rem' }}>
-                <Box onClick={decrementBet} as="button">- Bet</Box>
-                <Box onClick={incrementBet} as="button">+ Bet</Box>
+                <Box
+                    onClick={decrementBet}
+                    disabled={(!isResolved && cards.length > 1) || bet <= 0}
+                    as="button"
+                >- Bet</Box>
+                <Box disabled={(bet < 1 && isResolved) || !isResolved} as="button" onClick={play}>Play</Box>
+                <Box
+                    onClick={incrementBet}
+                    disabled={!isResolved && cards.length > 1}
+                    as="button"
+                >+ Bet</Box>
             </Flex>
-            {offerInsurance && (
-                <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '1rem' }}>
-                    <Box onClick={acceptInsurance} as="button">Accept</Box>
-                    <Box onClick={declineInsurance} as="button">Decline</Box>
-                </Flex>
-            )}
+            <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '0.5rem' }}>
+                <Box onClick={hit} disabled={offerInsurance || cards.length < 2 || isResolved} as="button">Hit</Box>
+                <Box onClick={stand} disabled={offerInsurance || cards.length < 2 || isResolved} as="button">Stand</Box>
+            </Flex>
+            <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '0.5rem' }}>
+                <Box onClick={split} disabled={offerInsurance || cards.length !== 2 || cards[0].value !== cards[1].value || isResolved} as="button">Split</Box>
+                <Box onClick={double} disabled={offerInsurance || cards.length !== 2 || isResolved} as="button">Double</Box>
+                <Box onClick={surrender} disabled={offerInsurance || cards.length !== 2 || isResolved} as="button">Surrender</Box>
+            </Flex>
             <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '1rem' }}>
-                <Box onClick={double} as="button">Double</Box>
-                <Box onClick={surrender} as="button">Surrender</Box>
-                <Box onClick={hit} as="button">Hit</Box>
-                <Box onClick={stand} as="button">Stand</Box>
+                <Box
+                    onClick={placeInsuranceBet}
+                    disabled={!offerInsurance || isResolved}
+                    as="button"
+                >Accept Insurance</Box>
+                <Box
+                    onClick={declineInsurance}
+                    disabled={!offerInsurance || isResolved}
+                    as="button"
+                >Decline Insurance</Box>
             </Flex>
         </Flex>
         <Text sx={{ color: 'yellow' }}>{`Bankroll: ¤ ${bankroll}`}</Text>
