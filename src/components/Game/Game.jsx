@@ -1,392 +1,472 @@
-import React, { useState } from 'react';
+import React, { useReducer, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Flex } from '../Box';
-import Shoe from './Shoe';
+import { Text } from '../Text';
 import Player from './Player';
 import Table from './Table';
 import Dealer from './Dealer';
 import { getRandomNumberInRange } from '../../utils/random';
+import { getDeck } from '../../utils/cards';
 
-export const Game = () => {
-    const [state, setState] = useState(() => ({
-        shoe: [],
-        player: { bankroll: 0, bet: 0, cards: [], insuranceBet: 0, isResolved: true },
-        dealer: { bank: 0, reveal: false, cards: [], offerInsurance: false },
-        configuration: {
-            numberOfDecks: 1,
-            penetration: 66,
-            cutRange: { min: 20, max: 80 },
-            dealerPeek: true,
-            dealerHitsSoft17: true,
-            doubleAfterSplit: true,
-            surrender: 'late', // Can be false, 'early', or 'late'.
-            double: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
-            blackjackPays: 3 / 2,
-            surrenderCost: 1 / 2,
-            insuranceCost: 1 / 2,
-        },
-    }));
+const isSoft = cards => cards.reduce((sum, card) => sum + card.value, 0) < 12 && cards.filter(card => card.value === 1).length > 0;
+const isBusted = cards => handValue(cards) > 21;
+const getUpCardValue = cards => cards?.[1]?.value;
+const isBlackjack = cards => cards.length === 2 && handValue(cards) === 21;
+const handValue = cards => {
+    const sum = cards.reduce((sum, card) => sum + card.value, 0); // Aces are counted as 1.
 
-    if (state.dealer.bank + state.player.bankroll + state.player.bet !== 0) {
-        console.error('Accounting error.', { bank: state.dealer.bank, bankroll: state.player.bankroll, bet: state.player.bet });
-    }
-
-    const betInsurance = player => {
-        const { insuranceCost } = state.configuration;
-        const amount = player.bet * insuranceCost;
-        player.bankroll -= amount;
-        player.insuranceBet += amount;
-    };
-
-    const winInsuranceBet = (player, dealer) => {
-        dealer.bank -= player.insuranceBet;
-        player.bankroll += player.insuranceBet; // Player gets the amount won.
-        player.bankroll += player.insuranceBet; // Player takes back their original bet.
-        player.insuranceBet = 0;
-    };
-
-    const loseInsuranceBet = (player, dealer) => {
-        dealer.bank += player.insuranceBet;
-        player.insuranceBet = 0;
-    };
-
-    const push = player => { player.isResolved = true; }
-
-    const loseBet = (player, dealer) => {
-        dealer.reveal = true;
-        dealer.bank += player.bet;
-        player.bet = 0;
-        player.isResolved = true;
-    };
-
-    const winBet = (player, dealer) => {
-        dealer.bank -= player.bet;
-        player.bankroll += player.bet;
-        player.isResolved = true;
-    };
-
-    const winBlackjack = (player, dealer) => {
-        dealer.reveal = true;
-        const { blackjackPays } = state.configuration;
-        const amount = player.bet * blackjackPays;
-        dealer.bank -= amount;
-        player.bankroll += amount;
-        player.isResolved = true;
-    };
-
-    const surrenderHand = (player, dealer) => {
-        const { surrenderCost } = state.configuration;
-        const amount = player.bet * surrenderCost;
-        dealer.bank += amount;
-        player.bankroll += player.bet - amount;
-        player.bet = 0;
-        player.isResolved = true;
-    };
-
-    const doubleBet = player => {
-        const amount = player.bet;
-        player.bankroll -= amount;
-        player.bet += amount;
-        player.isResolved = true;
-    };
-
-    const handValue = cards => {
-        const sum = cards.reduce((sum, card) => sum + card.value, 0); // Aces are counted as 1.
-
-        if (sum > 11) {
-            return sum;
-        }
-
-        if (cards.filter(card => card.value === 1).length > 0) { // Hand contains >= 1 Ace.
-            return sum + 10;
-        }
-        
+    if (sum > 11) {
         return sum;
-    };
+    }
 
-    const isSoft = cards => cards.reduce((sum, card) => sum + card.value, 0) < 12 && cards.filter(card => card.value === 1).length > 0;
-
-    const isBlackjack = cards => cards.length === 2 && handValue(cards) === 21;
-
-    const isBusted = cards => handValue(cards) > 21;
-
-    const getDeck = () => {
-        const suits = ['hearts', 'spades', 'diamonds', 'clubs'];
-        const ranks = [
-            { value: 1, rank: 1 },
-            { value: 2, rank: 2 },
-            { value: 3, rank: 3 },
-            { value: 4, rank: 4 },
-            { value: 5, rank: 5 },
-            { value: 6, rank: 6 },
-            { value: 7, rank: 7 },
-            { value: 8, rank: 8 },
-            { value: 9, rank: 9 },
-            { value: 10, rank: 10 },
-            { value: 10, rank: 'jack' },
-            { value: 10, rank: 'queen' },
-            { value: 10, rank: 'king' },
-        ];
-        const cards = [];
-        suits.forEach(suit => ranks.forEach(({ value, rank }) => cards.push({ suit, value, rank })));
-
-        return cards;
-    };
-    
-    const renewShoe = shoe => {
-        const { numberOfDecks } = state.configuration;
-        for (let i = 0; i < numberOfDecks; i++) {
-            shoe.push(...getDeck());
-        }
-        return shoe;
-    };
-    
-    const shuffle = shoe => {
-        for (let index = shoe.length - 1; index > 0; index--) {
-            const randomCardIndex = Math.floor(Math.random() * (index + 1));
-            const temp = shoe[randomCardIndex];
-            shoe[randomCardIndex] = shoe[index];
-            shoe[index] = temp;
-        }
-    };
-
-    const cut = shoe => {
-        const { cutRange: { min, max } } = state.configuration;
-        const percent = getRandomNumberInRange(min, max); // todo Allow the user to select the cut percent.
-        const temp = [ ...shoe ];
-        const location = Math.floor(temp.length * percent / 100);
-        shoe = [ ...temp.slice(location), ...temp.slice(0, location) ];
+    if (cards.filter(card => card.value === 1).length > 0) { // Hand contains >= 1 Ace.
+        return sum + 10;
     }
     
-    const burn = shoe => { shoe.pop(); return; };
+    return sum;
+};
 
-    const isPastCutCard = shoe => {
-        const { numberOfDecks, penetration } = state.configuration;
-        return shoe.length < 52 * numberOfDecks * (100 - penetration) / 100;
-    };
+const states = {
+    idle: 'idle',
+    deal: 'deal',
+    insurance: 'insurance',
+    peek: 'peek',
+    play: 'play',
+    dealer: 'dealer',
+};
 
-    const dealCards = (player, dealer, shoe) => {
-        for (let i = 0; i < 2; i++) {
-            player.cards.push(shoe.pop());
-            dealer.cards.push(shoe.pop());
+const reducer = (state, action) => {
+    switch (action.type) {
+        case 'incrementBet': {
+            const { index } = action.payload;
+            return {
+                ...state,
+                bankroll: state.bankroll - 1,
+                hands: state.hands.map((hand, handIndex) => handIndex === index ? { ...hand, bet: hand.bet + 1 } : hand),
+            };
         }
-    };
-
-    const isDealerShowingAce = dealer => dealer.cards?.[1].value === 1;
-
-    const offerInsurance = dealer => dealer.offerInsurance = true;
-
-    const revealDealerCards = dealer => dealer.reveal = true;
-
-    const playDealerHand = (dealer, shoe) => {
-        const cards = dealer.cards;
-
-        const mustHit = cards => {
-            const dealerHandValue = handValue(cards);
-            const { dealerHitsSoft17 } = state.configuration;
-
-            return dealerHitsSoft17 && isSoft(cards) ? dealerHandValue < 18 : dealerHandValue < 17;
-        };
-
-        while (mustHit(cards)) { cards.push(shoe.pop()); }
-    };
-
-    const resolveHand = (player, dealer) => {
-        if (player.bet < 1 || player.resolveHand) { // todo Is this redundant?
-            return;
+        case 'decrementBet': {
+            const { index } = action.payload;
+            return {
+                ...state,
+                bankroll: state.bankroll + 1,
+                hands: state.hands.map((hand, handIndex) => handIndex === index ? { ...hand, bet: hand.bet - 1 } : hand),
+            };
         }
-
-        if (isBusted(dealer.cards)) {
-            winBet(player, dealer);
-            return;
+        case 'clearBet': {
+            const { index } = action.payload;
+            return {
+                ...state,
+                bankroll: state.bankroll + state.hands[index].bet,
+                hands: state.hands.map((hand, handIndex) => handIndex === index ? { ...hand, bet: 0 } : hand),
+            };
         }
+        case 'stand': { // Mark the hand as completed by setting action = false. todo Maybe rename this to "completed"?
+            const { index } = action.payload;
 
-        const playerHandValue = handValue(player.cards);
-        const dealerHandValue = handValue(dealer.cards);
-
-        if (playerHandValue > dealerHandValue) {
-            winBet(player, dealer);
-            return;
+            return {
+                ...state,
+                hands: state.hands.map((hand, handIndex) => handIndex === index ? { ...hand, action: false } : hand),
+            };
         }
+        case 'hit': {
+            const { index } = action.payload;
 
-        if (playerHandValue < dealerHandValue) {
-            loseBet(player, dealer);
-            return;
-        }
+            const shoe = [ ...state.shoe ];
+            const cards = [ ...state.hands[index].cards ];
+            cards.push(shoe.pop());
 
-        push(player);
-    };
-
-    const incrementBet = () => setState(previousState => ({
-        ...previousState,
-        player: {
-            ...previousState.player,
-            bankroll: previousState.player.bankroll - 1,
-            bet: previousState.player.bet + 1,
-        },
-    }));
-
-    const decrementBet = () => {
-        if (state.player.bet < 1) {
-            return;
-        }
-
-        return setState(previousState => ({
-            ...previousState,
-            player: {
-                ...previousState.player,
-                bankroll: previousState.player.bankroll + 1,
-                bet: previousState.player.bet - 1,
-            },
-        }));
-    };
-
-    const play = () => {
-        if (state.player.bet < 1) { return; }
-
-        return setState(previousState => {
-            let player = { ...previousState.player, cards: [], isResolved: false };
-            let dealer = { ...previousState.dealer, cards: [], reveal: false, offerInsurance: false, };
-            let shoe = [ ...previousState.shoe ];
-
-            if (isPastCutCard(shoe)) {
-                renewShoe(shoe);
-                shuffle(shoe);
-                cut(shoe);
+            if (isBusted(cards)) {
+                console.log('The player busted.');
+                const { bet } = state.hands[index];
+                return {
+                    ...state,
+                    shoe,
+                    bank: state.bank + bet,
+                    hands: state.hands.map((hand, handIndex) => handIndex === index ? {
+                        ...hand,
+                        cards,
+                        bet: 0,
+                        action: false,
+                        settled: true, // Busted hands are settled immediately.
+                    } : hand),
+                };
             }
+            
+            return {
+                ...state,
+                shoe,
+                hands: state.hands.map((hand, handIndex) => handIndex === index ? { ...hand, cards } : hand),
+            };
+        }
+        case 'surrender': {
+            console.log('The player surrendered.');
+            const { index, configuration: { surrenderCost } } = action.payload;
+            const amount = state.hands[index].bet * surrenderCost;
 
-            burn(shoe);
-            dealCards(player, dealer, shoe);
+            return {
+                ...state,
+                bank: state.bank + amount,
+                hands: state.hands.map((hand, handIndex) => handIndex === index ? {
+                    ...hand,
+                    bet: hand.bet - amount,
+                    action: false,
+                    settled: true, // Surrendered hands are settled immediately.
+                } : hand),
+            };
+        }
+        case 'double': {
+            const { index } = action.payload;
 
-            if (isDealerShowingAce(dealer)) {
-                offerInsurance(dealer);
-                return { ...previousState, player, dealer, shoe };
+            const shoe = [ ...state.shoe ];
+            const cards = [ ...state.hands[index].cards ];
+            cards.push(shoe.pop());
+
+            if (isBusted(cards)) {
+                console.log('The player busted.');
+                const { bet } = state.hands[index];
+                return {
+                    ...state,
+                    bank: state.bank + bet,
+                    hands: state.hands.map((hand, handIndex) => handIndex === index ? {
+                        ...hand,
+                        cards,
+                        bet: 0,
+                        action: false,
+                        settled: true,
+                    } : hand),
+                    shoe,
+                };
             }
+            
+            return {
+                ...state,
+                hands: state.hands.map((hand, handIndex) => handIndex === index ? { ...hand, cards, action: false } : hand),
+                shoe,
+            };
+        }
+        case 'betInsurance': {
+            const { index } = action.payload;
+            const { configuration: { insuranceCost } } = action.payload;
+            const hand = state.hands[index];
 
-            const dealerHasBlackjack = isBlackjack(dealer.cards);
-            const playerHasBlackjack = isBlackjack(player.cards);
+            const amount = hand.bet * insuranceCost;
+            return {
+                ...state,
+                bankroll: state.bankroll - amount,
+                hands: state.hands.map((hand, handIndex) => handIndex === index ? {
+                    ...hand,
+                    insuranceBet: amount,
+                    offerInsurance: false,
+                } : hand),
+            };
+        }
+        case 'declineInsurance': {
+            const { index } = action.payload;
 
-            if (dealerHasBlackjack) {
-                revealDealerCards(dealer);
+            return {
+                ...state,
+                hands: state.hands.map((hand, handIndex) => handIndex === index ? { ...hand, offerInsurance: false } : hand),
+            };
+        }
+        case 'idle': { // Reset relevant state variables.
 
-                if (playerHasBlackjack) {
-                    push(player);
-                    return { ...previousState, player, dealer, shoe };
+            // Settle all outstanding bets.
+            let bank = state.bank;
+            const hands = [ ...state.hands ];
+            hands.filter(hand => !hand.settled).forEach(hand => {
+                if (isBlackjack(state.dealerCards)) {
+                    if (isBlackjack(hand.cards)) {
+                        console.log('The player pushed.');
+                        return hand; // The player pushes with a blackjack.
+                    }
+                    console.log('The dealer has a blackjack and the player did not. The player lost the bet.');
+                    bank += hand.bet;
+                    return { ...hand, bet: 0 }; // The player lost the bet.
                 }
 
-                loseBet(player, dealer);
-                return { ...previousState, player, dealer, shoe };
+                // The Dealer busted and the player did not so the player won the bet.
+                if (isBusted(state.dealerCards) && !isBusted(hand.cards)) {
+                    console.log('The Dealer busted.');
+                    const amountWon = hand.bet;
+                    return { ...hand, bet: hand.bet + amountWon };
+                }
+
+                // The value of the player's hand is equal to the value of the dealer's hand so the player pushes.
+                if (handValue(state.dealerCards) === handValue(hand.cards)) {
+                    console.log('The player pushed.');
+                    return hand;
+                }
+
+                // The value of the dealer's hand is greater than the value of the player's hand so the player lost the bet.
+                if (handValue(state.dealerCards) > handValue(hand.cards)) {
+                    console.log('The player lost.');
+                    bank += hand.bet;
+                    return { ...hand, bet: 0 };
+                }
+
+                // The value of the player's hand is greater than the value of the dealer's hand, so the player wins.
+                if (handValue(hand.cards) > handValue(state.dealerCards)) {
+                    console.log('The player won.');
+                    const amountWon = hand.bet;
+                    return { ...hand, bet: hand.bet + amountWon };
+                }
+
+                // No other outcomes are possible; busted, surrendered, and blackjack hands are settled immediately.
+                throw new Error('A hand is in an invalid state.');
+            });
+
+            return {
+                ...state,
+                bank,
+                hands: hands.map(hand => ({
+                    ...hand,
+                    insuranceBet: 0,
+                    offerInsurance: false,
+                    action: false,
+                    settled: true,
+                })),
+                dealerActionComplete: false,
+                currentState: states.idle,
+            };
+        }
+        case 'deal': { // Deal two cards to each player and the dealer.
+            const { configuration } = action.payload;
+
+            let shoe = [ ...state.shoe ];
+            const { numberOfDecks, penetration, cutRange } = configuration;
+            if (shoe.length < 52 * numberOfDecks * (100 - penetration) / 100) {
+
+                shoe = []; // Generate a new shoe.
+                for (let i = 0; i < numberOfDecks; i++) {
+                    shoe.push(...getDeck());
+                }
+
+                // Shuffle the cards in the shoe.
+                for (let index = shoe.length - 1; index > 0; index--) {
+                    const randomCardIndex = Math.floor(Math.random() * (index + 1));
+                    const temp = shoe[randomCardIndex];
+                    shoe[randomCardIndex] = shoe[index];
+                    shoe[index] = temp;
+                }
+
+                // Cut the cards.
+                const percent = getRandomNumberInRange(cutRange.min, cutRange.max); // todo Allow the user to select the cut percent.
+                const temp = [ ...shoe ];
+                const location = Math.floor(temp.length * percent / 100);
+                shoe = [ ...temp.slice(location), ...temp.slice(0, location) ];
             }
 
-            if (playerHasBlackjack) {
-                winBlackjack(player, dealer);
+            shoe.pop(); // Burn a card.
+
+            // Deal two cards to each player and the dealer.
+            const hands = state.hands.map(hand => ({ ...hand, cards: [], settled: false }));
+            let dealerCards = [];
+            for (let i = 0; i < 2; i++) {
+                hands.forEach(hand => hand.cards.push(shoe.pop()));
+                dealerCards.push(shoe.pop());
+            }
+    
+            return {
+                ...state,
+                shoe,
+                hands,
+                dealerCards,
+                reveal: false,
+                dealerActionComplete: false,
+                currentState: states.deal
+            };
+        }
+        case 'insurance': { // Offer insurance to each player.
+            return {
+                ...state,
+                hands: state.hands.map(hand => ({ ...hand, offerInsurance: true })),
+                currentState: states.insurance,
+            };
+        }
+        case 'peek': { // Peek at the dealer's down card and settle all outstanding insurance bets.
+
+            const dealerHasBlackjack = isBlackjack(state.dealerCards); // Peek
+
+            // Settle all outstanding insurance bets.
+            const hands = [ ...state.hands ];
+            let bank = state.bank;
+            let bankroll = state.bankroll;
+            const { insurancePays } = action.payload.configuration;
+            getUpCardValue(state.dealerCards) === 1 && hands.map(hand => {
+                if (dealerHasBlackjack) {
+                    console.log('The player won the insurance bet.');
+                    const amountWon = hand.insuranceBet * insurancePays;
+                    bank -= amountWon;
+                    bankroll += amountWon + hand.insuranceBet;
+                    return {
+                        ...hand,
+                        insuranceBet: 0,
+                        offerInsurance: false,
+                    };
+                }
+
+                console.log('The player lost the insurance bet.');
+                bank += hand.insuranceBet;
+                return {
+                    ...hand,
+                    insuranceBet: 0,
+                    offerInsurance: false,
+                };
+            });
+
+            return {
+                ...state,
+                bank,
+                bankroll,
+                hands,
+                reveal: isBlackjack(state.dealerCards),
+                currentState: states.peek, // todo This state seems redundant.
+            };
+        }
+        case 'play': { // Allow players to act on their hands.
+            const { blackjackPays } = action.payload.configuration;
+            let bank = state.bank;
+            state.hands.forEach(hand => {
+                if (isBlackjack(hand.cards)) {
+                    console.log('The player has a blackjack.');
+                    const amountWon = hand.bet !== 0 ? hand.bet * blackjackPays : 0;
+                    bank -= amountWon;
+                    return { ...hand, bet: hand.bet + amountWon, settled: true };
+                }
+            });
+
+            return {
+                ...state,
+                bank,
+                hands: state.hands.map(hand => ({ ...hand, action: true })),
+                currentState: states.play,
+            };
+        }
+        case 'dealer': {
+            if (state.hands.filter(hand => !hand.settled).length < 1) {
+                return {
+                    ...state,
+                    reveal: true,
+                    currentState: states.dealer,
+                };
             }
 
-            return { ...previousState, player, dealer, shoe };
-        });
-    };
-
-    const placeInsuranceBet = () => setState(previousState => {
-        const player = { ...previousState.player, cards: [...previousState.player.cards] };
-        const dealer = { ...previousState.dealer, cards: [...previousState.dealer.cards], offerInsurance: false };
-
-        betInsurance(player);
-
-        if (isBlackjack(dealer.cards)) {
-            revealDealerCards(dealer);
-            winInsuranceBet(player, dealer);
-
-            if (isBlackjack(player.cards)) {
-                push(player);
-                return { ...previousState, dealer, player };
+            // Play out the dealer's hand.
+            const shoe = [ ...state.shoe ];
+            const dealerCards = [ ...state.dealerCards ];
+            if (!state.dealerActionComplete) {
+                const { dealerHitsSoft17 } = action.payload.configuration;
+                const mustHit = cards => {
+                    const dealerHandValue = handValue(cards);
+                    return dealerHitsSoft17 && isSoft(cards) ? dealerHandValue < 18 : dealerHandValue < 17;
+                };
+                while (mustHit(dealerCards)) { dealerCards.push(shoe.pop()); }
             }
 
-            loseBet(player, dealer);
-            return { ...previousState, dealer, player };
+            return {
+                ...state,
+                shoe,
+                dealerCards,
+                reveal: true,
+                dealerActionComplete: true,
+                currentState: states.dealer,
+            };
         }
+        default:
+            throw new Error(`Unhandled state: ${action.type}`);
+    }
+};
 
-        loseInsuranceBet(player, dealer);
-
-        return { ...previousState, dealer, player };
+export const Game = () => {
+    const [state, dispatch] = useReducer(reducer, {
+        bank: 0,
+        bankroll: 0,
+        shoe: [],
+        hands: [{
+            bet: 0,
+            cards: [],
+            insuranceBet: 0,
+            action: false,
+            offerInsurance: false,
+            settled: false,
+        }],
+        dealerCards: [],
+        reveal: false,
+        dealerActionComplete: true,
+        currentState: states.idle,
     });
+    const [configuration] = useState(() => ({
+        numberOfDecks: 1,
+        penetration: 66,
+        cutRange: { min: 20, max: 80 },
+        dealerPeek: true,
+        dealerHitsSoft17: true,
+        doubleAfterSplit: true,
+        surrender: 'late', // Can be false, 'early', or 'late'.
+        double: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+        blackjackPays: 3 / 2,
+        surrenderCost: 1 / 2,
+        insuranceCost: 1 / 2,
+        insurancePays: 2,
+    }));
 
-    const declineInsuranceBet = () => setState(previousState => {
-        const player = { ...previousState.player, cards: [...previousState.player.cards] };
-        const dealer = { ...previousState.dealer, cards: [...previousState.dealer.cards], offerInsurance: false };
+    const totalBets = state.hands.reduce((sum, hand) => sum + hand.bet, 0);
+    if (state.bank + state.bankroll + totalBets !== 0) {
+        console.error('Accounting error.', { bank: state.bank, bankroll: state.bankroll, totalBets });
+    }
 
-        if (isBlackjack(dealer.cards)) {
-            dealer.reveal = true;
-
-            if (isBlackjack(player.cards)) {
-                push(player);
-                return { ...previousState, dealer, player };
+    // Implicit State Transitions
+    switch (state.currentState) {
+        case states.deal: {
+            const upCardValue = getUpCardValue(state.dealerCards);
+            if (upCardValue === 1) { // Transition from deal to insurance when dealer shows ace.
+                dispatch({ type: states.insurance, payload: { configuration } });
+                break;
+            };
+            
+            if (upCardValue === 10) { // Transition from deal to peek when dealer shows 10.
+                dispatch({ type: states.peek, payload: { configuration } });
+                break;
+            }
+    
+            dispatch({ type: states.play, payload: { configuration } }); // Transition from deal to play when dealer shows 2 - 9.
+            break;
+        }
+        case states.play: {
+            // Transition from play to idle when all players are finished with all hands.
+            if (state.hands.filter(hand => hand.action).length < 1) {
+                dispatch({ type: states.dealer, payload: { configuration } });
+            }
+            break;
+        }
+        case states.insurance: {
+            // Transition from insurance to peek when all players have been offered insurance for each hand.
+            if (state.hands.filter(hand => hand.offerInsurance).length < 1) {
+                dispatch({ type: states.peek, payload: { configuration } });
+            }
+            break;
+        }
+        case states.peek: {
+            // Transition from peek to idle when the dealer has a blackjack.
+            if (isBlackjack(state.dealerCards)) {
+                dispatch({ type: states.idle, payload: { configuration } });
+                break;
             }
 
-            loseBet(player, dealer);
-            return { ...previousState, dealer, player };
+            // Transition from peek to play when the dealer does not have a blackjack.
+            dispatch({ type: states.play, payload: { configuration } });
+            break;
         }
-
-        return { ...previousState, dealer, player };
-    });
-
-    const hit = () => setState(previousState => {
-        let player = {...previousState.player, cards: [...previousState.player.cards]};
-        let dealer = {...previousState.dealer, cards: [...previousState.dealer.cards]};
-        let shoe = [...previousState.shoe];
-
-        player.cards.push(shoe.pop());
-
-        if (isBusted(player.cards)) { // Player busted.
-            loseBet(player, dealer);
+        case states.dealer: {
+            // Transition from dealer to idle after the dealer has finished playing.
+            dispatch({ type: states.idle, payload: { configuration } });
+            break;
         }
-
-        return { ...previousState, player, dealer, shoe };
-    });
-
-    const stand = () => setState(previousState => {
-        let player = { ...previousState.player, cards: [...previousState.player.cards] };
-        let dealer = { ...previousState.dealer, cards: [...previousState.dealer.cards], reveal: true };
-        let shoe = [ ...previousState.shoe ];
-
-        playDealerHand(dealer, shoe);
-        resolveHand(player, dealer);
-
-        return { ...previousState, dealer, player, shoe };
-    });
-
-    const surrender = () => setState(previousState => {
-        let player = { ...previousState.player };
-        let dealer = { ...previousState.dealer, reveal: true };
-
-        surrenderHand(player, dealer);
-
-        return { ...previousState, player, dealer };
-    });
-
-    const double = () => setState(previousState => {
-        let player = { ...previousState.player, cards: [...previousState.player.cards] };
-        let dealer = { ...previousState.dealer, cards: [...previousState.dealer.cards], reveal: true };
-        let shoe = [ ...previousState.shoe ];
-
-        doubleBet(player);
-
-        player.cards.push(shoe.pop());
-
-        if (isBusted(player.cards)) {
-            loseBet(player, dealer);
-            return { ...previousState, player, dealer, shoe };
+        default: {
+            break;
         }
-
-        playDealerHand(dealer, shoe);
-        resolveHand(player, dealer);
-
-        return { ...previousState, player, dealer, shoe };
-    });
-
-    const split = () => setState(previousState => {
-        console.log('split');
-        return previousState;
-    });
+    }
 
     return (
         <Flex sx={{
@@ -397,29 +477,29 @@ export const Game = () => {
             justifyContent: 'flex-start',
             alignItems: 'center',
         }}>
-            <Flex sx={{ m: '1rem', px: '1rem', width: '100%', justifyContent: 'flex-start' }}>
-                <Shoe cards={state.shoe} />
+            <Flex sx={{ justifyContent: 'space-between', p: '1rem', width: '100%' }}>
+                <Text sx={{ color: 'yellow' }}>{`Decks: ${configuration.numberOfDecks}`}</Text>
+                <Text sx={{ color: 'yellow' }}>{`Bank: ¤ ${state.bank}`}</Text>
+                <Text sx={{ color: 'yellow' }}>{`Shoe: ${state.shoe.length} cards`}</Text>
             </Flex>
-            <Dealer
-                handValue={handValue(state.dealer.cards)}
-                {...state.dealer}
+            <Dealer handValue={handValue} {...state} />
+            <Table
+                placeInsuranceBet={index => dispatch({ type: 'betInsurance', payload: { index, configuration } })}
+                declineInsurance={index => dispatch({ type: 'declineInsurance', paylod: { index, configuration } })}
+                {...state}
             />
-            <Table sx={{ px: '1rem', width: '100%', height: '10rem' }} insuranceBet={state.player.insuranceBet} />
             <Player
-                sx={{ px: '1rem' }}
-                handValue={handValue(state.player.cards)}
-                play={play}
-                incrementBet={incrementBet}
-                decrementBet={decrementBet}
-                hit={hit}
-                stand={stand}
-                surrender={surrender}
-                double={double}
-                split={split}
-                placeInsuranceBet={placeInsuranceBet}
-                declineInsurance={declineInsuranceBet}
-                offerInsurance={state.dealer.offerInsurance}
-                {...state.player}
+                handValue={handValue}
+                incrementBet={index => dispatch({ type: 'incrementBet', payload: { index } })}
+                decrementBet={index => dispatch({ type: 'decrementBet', payload: { index } })}
+                clearBet={index => dispatch({ type: 'clearBet', payload: { index } })}
+                deal={() => dispatch({ type: 'deal', payload: { configuration } })}
+                stand={index => dispatch({ type: 'stand', payload: { index } })}
+                hit={index => dispatch({ type: 'hit', payload: { index } })}
+                surrender={index => dispatch({ type: 'surrender', payload: { index, configuration } })}
+                double={index => dispatch({ type: 'double', payload: { index } })}
+                // split={split}
+                {...state}
             />
         </Flex>
     );
