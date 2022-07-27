@@ -17,7 +17,7 @@ const Player = ({
     bankroll,
     hands,
 }) => {
-    const activeHandIndex = hands.findIndex(hand => hand.actionComplete === false);
+    const activeHandIndex = hands.findIndex(hand => hand.action);
     return (
         <Flex sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
             <Flex sx={{ flexDirection: 'row', justifyContent: 'space-around', gap: '1rem' }}>
