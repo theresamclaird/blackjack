@@ -85,6 +85,8 @@ const Hand = ({
                     {/* <Box onClick={split} as="button">Split</Box> */}
                     <Box onClick={double} as="button">Double</Box>
                     <Box onClick={surrender} as="button">Surrender</Box>
+                </Flex>
+                <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '0.5rem' }}>
                     <Box onClick={hit} as="button">Hit</Box>
                     <Box onClick={stand} as="button">Stand</Box>
                 </Flex>

@@ -5,6 +5,7 @@ import Hand from './Hand';
 
 const Player = ({
     handValue,
+    addHand,
     incrementBet,
     decrementBet,
     clearBet,
@@ -17,31 +18,34 @@ const Player = ({
     bankroll,
     hands,
 }) => {
-    const activeHandIndex = hands.findIndex(hand => hand.action);
+    const activeHandIndex = hands.findLastIndex(hand => !hand.completed);
     return (
-        <Flex sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
-            <Flex sx={{ flexDirection: 'row', justifyContent: 'space-around', gap: '1rem' }}>
-                {hands.map((hand, index) => (
-                    <React.Fragment key={`${index}-${JSON.stringify(hand)}`}>
+        <Flex sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '5rem' }}>
+            <Flex sx={{ flexDirection: 'row', justifyContent: 'space-around', gap: '5rem' }}>
+                {hands.map((hand, handIndex) => (
+                    <React.Fragment key={`${handIndex}-${JSON.stringify(hand)}`}>
                         <Hand
-                            active={index === activeHandIndex}
+                            active={handIndex === activeHandIndex}
                             handValue={handValue}
-                            incrementBet={() => incrementBet(index)}
-                            decrementBet={() => decrementBet(index)}
-                            clearBet={() => clearBet(index)}
-                            stand={() => stand(index)}
-                            hit={() => hit(index)}
-                            surrender={() => surrender(index)}
-                            double={() => double(index)}
+                            incrementBet={() => incrementBet(handIndex)}
+                            decrementBet={() => decrementBet(handIndex)}
+                            clearBet={() => clearBet(handIndex)}
+                            stand={() => stand(handIndex)}
+                            hit={() => hit(handIndex)}
+                            surrender={() => surrender(handIndex)}
+                            double={() => double(handIndex)}
                             {...hand}
                         />
                     </React.Fragment>
                 ))}
             </Flex>
-            <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '1rem' }}>
-                <Box as="button" onClick={deal}>Deal</Box>
+            <Flex sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
+                <Flex sx={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
+                    <Box as="button" onClick={deal}>Deal</Box>
+                    <Box as="button" onClick={addHand}>+ Hand</Box>
+                </Flex>
+                <Text sx={{ color: 'yellow' }}>{`Bankroll: ¤ ${bankroll}`}</Text>
             </Flex>
-            <Text sx={{ color: 'yellow' }}>{`Bankroll: ¤ ${bankroll}`}</Text>
         </Flex>
     );
 };

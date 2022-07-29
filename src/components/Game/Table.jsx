@@ -1,6 +1,7 @@
 import React from 'react';
 import Box, { Flex } from '../Box';
 import { Text } from '../Text';
+import states from './states';
 
 const Table = ({
     placeInsuranceBet,
@@ -16,7 +17,7 @@ const Table = ({
     };
 
     const activeHandIndex = hands.findIndex(hand => hand.offerInsurance);
-    const disabled = currentState !== 'insurance' && activeHandIndex < 0;
+    const disabled = currentState !== states.waitInsurance.label;
 
     return (
         <Flex sx={{ flexDirection: 'column', alignItems: 'center', width: '100%' }}>
@@ -24,7 +25,7 @@ const Table = ({
             <Text sx={{ ...commonTextStyle, mb: 'md', color: 'white', }}>Dealer must hit soft 17</Text>
             <Flex sx={{
                 flexDirection: 'row',
-                justifyContent: 'space-around',
+                justifyContent: 'space-between',
                 width: '100%',
                 borderStyle: 'solid',
                 borderWidth: '1px',
@@ -32,7 +33,7 @@ const Table = ({
                 borderLeftWidth: 0,
                 borderRightWidth: 0,
                 py: 'sm',
-                px: 'sm',
+                px: 'lg',
             }}>
                 <Box onClick={() => declineInsurance(activeHandIndex)} disabled={disabled} as="button">Decline</Box>
                 <Text sx={{

@@ -3,8 +3,8 @@ import Box, { Flex } from '../Box';
 import Card from './Card';
 import HandValue from './HandValue';
 
-const Dealer = ({ handValue, reveal, dealerCards = [] }) => {
-    const upCardValue = dealerCards.length === 2 ? dealerCards?.[1].value : 0;
+const Dealer = ({ handValue, reveal, dealerCards }) => {
+    const upCardValue = dealerCards.length > 1 ? dealerCards?.[1].value : 0;
 
     return (
         <Flex sx={{
@@ -30,7 +30,11 @@ const Dealer = ({ handValue, reveal, dealerCards = [] }) => {
                     justifyContent: 'center',
                     gap: '1rem',
                 }}>
-                    {dealerCards.map((card, index) => <React.Fragment key={`dealer-card-${index}`}><Card showBack={!reveal && index === 0} {...card} /></React.Fragment>)}
+                    {dealerCards.map((card, index) => (
+                        <React.Fragment key={`dealer-card-${index}`}>
+                            <Card showBack={!reveal && index === 0} {...card} />
+                        </React.Fragment>
+                    ))}
                 </Flex>
             </Box>
             <HandValue value={reveal ? handValue(dealerCards) : upCardValue} />
