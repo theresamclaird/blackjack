@@ -1,4 +1,6 @@
-export const getDeck = () => {
+// todo Unit test these.
+
+const getDeck = () => {
     const suits = ['hearts', 'spades', 'diamonds', 'clubs'];
     const ranks = [
         { value: 1, rank: 1 },
@@ -19,4 +21,31 @@ export const getDeck = () => {
     suits.forEach(suit => ranks.forEach(({ value, rank }) => cards.push({ suit, value, rank })));
 
     return cards;
+};
+
+const isSoft = cards => cards.reduce((sum, card) => sum + card.value, 0) < 12 && cards.filter(card => card.value === 1).length > 0;
+const isBusted = cards => handValue(cards) > 21;
+const getUpCardValue = cards => cards?.[1]?.value;
+const isBlackjack = cards => cards.length === 2 && handValue(cards) === 21;
+const handValue = cards => {
+    const sum = cards.reduce((sum, card) => sum + card.value, 0); // Aces are counted as 1.
+
+    if (sum > 11) {
+        return sum;
+    }
+
+    if (cards.filter(card => card.value === 1).length > 0) { // Hand contains >= 1 Ace.
+        return sum + 10;
+    }
+    
+    return sum;
+};
+
+export {
+    getDeck,
+    isSoft,
+    isBusted,
+    getUpCardValue,
+    isBlackjack,
+    handValue,
 };

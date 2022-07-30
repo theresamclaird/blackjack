@@ -1,7 +1,7 @@
 import React from 'react';
 import Box, { Flex } from '../Box';
 import { Text } from '../Text';
-import states from './states';
+import mutations from './mutations';
 
 const Table = ({
     placeInsuranceBet,
@@ -17,7 +17,7 @@ const Table = ({
     };
 
     const activeHandIndex = hands.findIndex(hand => hand.offerInsurance);
-    const disabled = currentState !== states.waitInsurance.label;
+    const disabled = currentState !== mutations.waitInsurance.label;
 
     return (
         <Flex sx={{ flexDirection: 'column', alignItems: 'center', width: '100%' }}>

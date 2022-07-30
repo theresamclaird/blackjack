@@ -1,7 +1,7 @@
 const colors = {
     feltGreen: '#35654d',
-    darkGreen: '#003300',
-    yellow: '#ffff00',
+    darkGreen: '#030',
+    yellow: '#ff0',
     gray: '#ccc',
     black: '#000',
     red: '#f00',
@@ -27,8 +27,16 @@ const textVariants = {
     },
 };
 
+const buttonStyle = {
+    backgroundColor: 'feltGreen',
+    padding: 'sm',
+    cursor: 'pointer',
+};
+
 export default {
     colors,
     space,
     fonts,
+    buttonStyle,
+    textVariants,
 };

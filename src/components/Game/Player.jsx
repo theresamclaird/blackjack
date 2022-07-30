@@ -2,10 +2,12 @@ import React from 'react';
 import Box, { Flex } from '../Box';
 import { Text } from '../Text';
 import Hand from './Hand';
+import mutations from './mutations';
 
 const Player = ({
     handValue,
     addHand,
+    removeHand,
     incrementBet,
     decrementBet,
     clearBet,
@@ -17,6 +19,7 @@ const Player = ({
     split,
     bankroll,
     hands,
+    currentState,
 }) => {
     const activeHandIndex = hands.findLastIndex(hand => !hand.completed);
     return (
@@ -27,6 +30,7 @@ const Player = ({
                         <Hand
                             active={handIndex === activeHandIndex}
                             handValue={handValue}
+                            removeHand={() => removeHand(handIndex)}
                             incrementBet={() => incrementBet(handIndex)}
                             decrementBet={() => decrementBet(handIndex)}
                             clearBet={() => clearBet(handIndex)}
@@ -34,6 +38,9 @@ const Player = ({
                             hit={() => hit(handIndex)}
                             surrender={() => surrender(handIndex)}
                             double={() => double(handIndex)}
+                            split={() => split(handIndex)}
+                            currentState={currentState}
+                            numberOfHands={hands.length}
                             {...hand}
                         />
                     </React.Fragment>
@@ -41,8 +48,8 @@ const Player = ({
             </Flex>
             <Flex sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
                 <Flex sx={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
-                    <Box as="button" onClick={deal}>Deal</Box>
-                    <Box as="button" onClick={addHand}>+ Hand</Box>
+                    <Box disabled={currentState !== mutations.idle.label} as="button" onClick={deal}>Deal</Box>
+                    <Box disabled={currentState !== mutations.idle.label} as="button" onClick={addHand}>+ Hand</Box>
                 </Flex>
                 <Text sx={{ color: 'yellow' }}>{`Bankroll: ¤ ${bankroll}`}</Text>
             </Flex>

@@ -5,7 +5,6 @@ import HandValue from './HandValue';
 
 const Dealer = ({ handValue, reveal, dealerCards }) => {
     const upCardValue = dealerCards.length > 1 ? dealerCards?.[1].value : 0;
-
     return (
         <Flex sx={{
             flexDirection: 'column',
@@ -37,7 +36,7 @@ const Dealer = ({ handValue, reveal, dealerCards }) => {
                     ))}
                 </Flex>
             </Box>
-            <HandValue value={reveal ? handValue(dealerCards) : upCardValue} />
+            <HandValue value={reveal ? handValue(dealerCards) : upCardValue === 1 ? '1/11' : upCardValue} />
         </Flex>
     );
 };

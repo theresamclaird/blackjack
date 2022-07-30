@@ -2,10 +2,12 @@ import React from 'react';
 import Box, { Flex } from '../Box';
 import HandValue from './HandValue';
 import Card from './Card';
+import mutations from './mutations';
 
 const Hand = ({
     active,
     handValue,
+    removeHand,
     incrementBet,
     decrementBet,
     clearBet,
@@ -13,9 +15,15 @@ const Hand = ({
     hit,
     surrender,
     double,
+    split,
     bet,
     cards,
+    currentState,
+    numberOfHands,
+    settled,
 }) => {
+    const disableActionButtons =  !active || currentState === mutations.waitInsurance.label || settled;
+    const disableInitialActionButtons = disableActionButtons || cards.length !== 2;
     return (
         <Flex sx={{
             mt: '3rem',
@@ -45,7 +53,8 @@ const Hand = ({
                     width: '10rem',
                     height: '10rem',
                     borderRadius: '5rem',
-                    boxShadow: 'inset 0 0 5rem #003300',
+                    backgroundColor: active ? '#040' : 'transparent',
+                    boxShadow: active ? '' : 'inset 0 0 5rem #030',
                     p: '1rem',
                 }}>
                     <Flex sx={{
@@ -63,7 +72,7 @@ const Hand = ({
                             justifyContent: 'space-between',
                             alignItems: 'center',
                         }}>
-                            <Box onClick={decrementBet} as="button">-</Box>
+                            <Box disabled={currentState !== mutations.idle.label} onClick={decrementBet} as="button">-</Box>
                             <Box
                                 sx={{
                                     fontFamily: 'default',
@@ -72,23 +81,26 @@ const Hand = ({
                                     fontWeight: '900',
                                     mx: 'sm',
                                 }}>{`¤ ${bet}`}</Box>
-                            <Box onClick={incrementBet} as="button">+</Box>
+                            <Box disabled={currentState !== mutations.idle.label} onClick={incrementBet} as="button">+</Box>
                         </Flex>
 
-                        <Box as="button" onClick={clearBet}>Clear</Box>
+                        <Box disabled={currentState !== mutations.idle.label} as="button" onClick={clearBet}>Clear</Box>
 
                     </Flex>
                 </Flex>
             </Box>
             <Flex sx={{ flexDirection: 'column', justifyContent: 'center', gap: '1rem' }}>
                 <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '0.5rem' }}>
-                    {/* <Box onClick={split} as="button">Split</Box> */}
-                    <Box onClick={double} as="button">Double</Box>
-                    <Box onClick={surrender} as="button">Surrender</Box>
+                    <Box disabled={disableInitialActionButtons} onClick={double} as="button">Double</Box>
+                    <Box disabled={disableInitialActionButtons} onClick={surrender} as="button">Surrender</Box>
+                    <Box disabled={disableInitialActionButtons || cards.length !== 2 || cards[0].value !== cards[1].value} onClick={split} as="button">Split</Box>
                 </Flex>
                 <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '0.5rem' }}>
-                    <Box onClick={hit} as="button">Hit</Box>
-                    <Box onClick={stand} as="button">Stand</Box>
+                    <Box disabled={disableActionButtons} onClick={hit} as="button">Hit</Box>
+                    <Box disabled={disableActionButtons} onClick={stand} as="button">Stand</Box>
+                </Flex>
+                <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '0.5rem' }}>
+                    <Box disabled={currentState !== mutations.idle.label || numberOfHands < 2} onClick={removeHand} as="button">- Hand</Box>
                 </Flex>
             </Flex>
         </Flex>

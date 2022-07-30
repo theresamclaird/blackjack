@@ -1,4 +1,6 @@
-import states from './states';
+import mutations from './mutations';
+
+// todo Add tests for removeHand.
 
 describe('states', () => {
 
@@ -19,12 +21,12 @@ describe('states', () => {
         dealerCards: [],
         reveal: false,
         dealerActionComplete: true,
-        currentState: states.idle.label,
+        currentState: mutations.idle.label,
     };
 
     describe('incrementBet', () => {
         test('incrementBet subtracts 1 from bankroll and adds 1 to the bet', () =>{
-            expect(states.incrementBet.mutate(baseState, 0)).toEqual({
+            expect(mutations.incrementBet.mutate(baseState, 0)).toEqual({
                 ...baseState,
                 bankroll: -1,
                 hands: [{ ...baseState.hands[0], bet: 1 }],
@@ -34,7 +36,7 @@ describe('states', () => {
 
     describe('decrementBet', () => {
         test('decrementBet subtracts 1 from the bet and increments the bankroll by 1', () =>{
-            expect(states.decrementBet.mutate(baseState, 0)).toEqual({
+            expect(mutations.decrementBet.mutate(baseState, 0)).toEqual({
                 ...baseState,
                 bankroll: 1,
                 hands: [{ ...baseState.hands[0], bet: -1 }],
@@ -46,7 +48,7 @@ describe('states', () => {
         test('clearBet subtracts the bet amount from the bet and increments the bankroll by the bet amount', () =>{
             const state = { ...baseState, hands: [{ ...baseState.hands[0], bet: 1 }] };
 
-            expect(states.clearBet.mutate(state, 0)).toEqual({
+            expect(mutations.clearBet.mutate(state, 0)).toEqual({
                 ...state,
                 bankroll: 1,
                 hands: [{ ...baseState.hands[0], bet: 0 }],
@@ -65,7 +67,7 @@ describe('states', () => {
                 }],
             };
 
-            expect(states.stand.mutate(state, 0)).toEqual({
+            expect(mutations.stand.mutate(state, 0)).toEqual({
                 ...baseState,
                 hands: [{
                     ...baseState.hands[0],
@@ -84,7 +86,7 @@ describe('states', () => {
                 hands: [{ ...baseState.hands[0], bet: 1 }],
             };
 
-            expect(states.surrender.mutate(state, 0, { surrenderCost: 1 / 2 })).toEqual({
+            expect(mutations.surrender.mutate(state, 0)).toEqual({
                 ...baseState,
                 bank: 1 / 2,
                 hands: [{ ...baseState.hands[0], bet: 1 / 2, completed: true, settled: true },],
@@ -100,7 +102,7 @@ describe('states', () => {
                 shoe: [{ value: 1 }],
             };
 
-            expect(states.hit.mutate(state, 0)).toEqual({
+            expect(mutations.hit.mutate(state, 0)).toEqual({
                 ...baseState,
                 shoe: [],
                 hands: [{ ...baseState.hands[0], cards: [{ value: 1 }] }],
@@ -114,7 +116,7 @@ describe('states', () => {
                 hands: [{ ...baseState.hands[0], bet: 1, cards: [{ value: 10 }, { value: 10 }] }],
             };
 
-            expect(states.hit.mutate(state, 0)).toEqual({
+            expect(mutations.hit.mutate(state, 0)).toEqual({
                 ...baseState,
                 bank: 1,
                 shoe: [],
@@ -131,7 +133,7 @@ describe('states', () => {
                 shoe: [{ value: 1 }],
                 hands: [{ ...baseState.hands[0], bet: 1, cards: [{ value: 9 }, { value: 2 }] }],
             };
-            expect(states.double.mutate(state, 0)).toEqual({
+            expect(mutations.double.mutate(state, 0)).toEqual({
                 ...baseState,
                 bankroll: 0,
                 shoe: [],
@@ -146,7 +148,7 @@ describe('states', () => {
             hands: [{ ...baseState.hands[0], bet: 1, offerInsurance: true, }],
         };
 
-        expect(states.betInsurance.mutate(state, 0, { insuranceCost: 1 / 2 })).toEqual({
+        expect(mutations.betInsurance.mutate(state, 0)).toEqual({
             ...baseState,
             bankroll: - 1 / 2,
             hands: [{ ...baseState.hands[0], bet: 1, insuranceBet: 1 / 2, offerInsurance: false }],
@@ -158,7 +160,7 @@ describe('states', () => {
             ...baseState,
             hands: [{ ...baseState.hands[0], offerInsurance: true }],
         };
-        expect(states.declineInsurance.mutate(state, 0)).toEqual({
+        expect(mutations.declineInsurance.mutate(state, 0)).toEqual({
             ...baseState,
             hands: [{ ...baseState.hands[0], offerInsurance: false }],
         });
@@ -176,9 +178,9 @@ describe('states', () => {
             }],
             reveal: true,
             dealerActionComplete: true,
-            currentState: states.settleBets.label,
+            currentState: mutations.settleBets.label,
         };
-        expect(states.idle.mutate(state)).toEqual({
+        expect(mutations.idle.mutate(state)).toEqual({
             ...baseState,
             shoe: [{ value: 10 }],
             hands: [{
@@ -187,9 +189,9 @@ describe('states', () => {
                 settled: true,
                 offerInsurance: false,
             }],
-            reveal: false,
+            reveal: true,
             dealerActionComplete: true,
-            currentState: states.idle.label,
+            currentState: mutations.idle.label,
         });
     });
 
@@ -212,7 +214,7 @@ describe('states', () => {
                 { value: 7 }, { value: 8 }, { value: 9 }, { value: 10 },
             ],
         };
-        expect(states.dealCards.mutate(state, { numberOfDecks: 1, penetration: 66, cutRange: { min: 20, max: 80 } })).toEqual({
+        expect(mutations.dealCards.mutate(state, { numberOfDecks: 1, penetration: 66, cutRange: { min: 20, max: 80 } })).toEqual({
             ...baseState,
             shoe: [
                 { value: 1 }, { value: 1 }, { value: 1 }, { value: 1 },
@@ -231,7 +233,7 @@ describe('states', () => {
             hands: [{ ...baseState.hands[0], cards: [{ value: 9 }, { value: 7 }], settled: false }],
             dealerCards: [{ value: 8 }, { value: 6 }],
             dealerActionComplete: false,
-            currentState: states.dealCards.label,
+            currentState: mutations.dealCards.label,
         });
     });
 
@@ -239,23 +241,23 @@ describe('states', () => {
         const state = {
             ...baseState,
             hands: [{ ...baseState.hands[0], offerInsurance: false }],
-            currentState: states.dealCards.label,
+            currentState: mutations.dealCards.label,
         };
-        expect(states.offerInsurance.mutate(state)).toEqual({
+        expect(mutations.offerInsurance.mutate(state)).toEqual({
             ...baseState,
             hands: [{ ...baseState.hands[0], offerInsurance: true }],
-            currentState: states.offerInsurance.label,
+            currentState: mutations.offerInsurance.label,
         });
     });
 
     describe('waitInsurance', () => {
         const state = {
             ...baseState,
-            currentState: states.dealCards.label,
+            currentState: mutations.dealCards.label,
         };
-        expect(states.waitInsurance.mutate(state)).toEqual({
+        expect(mutations.waitInsurance.mutate(state)).toEqual({
             ...baseState,
-            currentState: states.waitInsurance.label,
+            currentState: mutations.waitInsurance.label,
         });
     });
 
@@ -266,9 +268,9 @@ describe('states', () => {
                 dealerCards: [{ value: 6 }, { value: 10 }],
                 hands: [{ ...baseState.hands[0], cards: [{ value: 2 }, { value: 3 }] }],
             };
-            expect(states.dealerPeek.mutate(state, { insurancePays: 2 })).toEqual({
+            expect(mutations.dealerPeek.mutate(state)).toEqual({
                 ...state,
-                currentState: states.dealerPeek.label,
+                currentState: mutations.dealerPeek.label,
             });
         });
         test('dealerPeek with dealer blackjack', () => {
@@ -277,10 +279,10 @@ describe('states', () => {
                 dealerCards: [{ value: 1 }, { value: 10 }],
                 hands: [{ ...baseState.hands[0], cards: [{ value: 2 }, { value: 3 }] }],
             };
-            expect(states.dealerPeek.mutate(state, { insurancePays: 2 })).toEqual({
+            expect(mutations.dealerPeek.mutate(state)).toEqual({
                 ...state,
                 reveal: true,
-                currentState: states.dealerPeek.label,
+                currentState: mutations.dealerPeek.label,
             });
         });
         test('dealerPeek without dealer blackjack and insurance', () => {
@@ -289,12 +291,12 @@ describe('states', () => {
                 dealerCards: [{ value: 6 }, { value: 1 }],
                 hands: [{ ...baseState.hands[0], bet: 1, cards: [{ value: 2 }, { value: 3 }], insuranceBet: 1 / 2 }],
             };
-            expect(states.dealerPeek.mutate(state, { insurancePays: 2 })).toEqual({
+            expect(mutations.dealerPeek.mutate(state)).toEqual({
                 ...baseState,
                 bank: 1 / 2,
                 dealerCards: [{ value: 6 }, { value: 1 }],
                 hands: [{ ...baseState.hands[0], bet: 1, cards: [{ value: 2 }, { value: 3 }], insuranceBet: 0 }],
-                currentState: states.dealerPeek.label,
+                currentState: mutations.dealerPeek.label,
             });
         });
         test('dealerPeek with dealer blackjack and insurance', () => {
@@ -303,14 +305,14 @@ describe('states', () => {
                 dealerCards: [{ value: 10 }, { value: 1 }],
                 hands: [{ ...baseState.hands[0], bet: 1, cards: [{ value: 2 }, { value: 3 }], insuranceBet: 1 / 2 }],
             };
-            expect(states.dealerPeek.mutate(state, { insurancePays: 2 })).toEqual({
+            expect(mutations.dealerPeek.mutate(state)).toEqual({
                 ...baseState,
                 bank: -1,
                 bankroll: 1.5 ,
                 dealerCards: [{ value: 10 }, { value: 1 }],
                 hands: [{ ...baseState.hands[0], bet: 1, cards: [{ value: 2 }, { value: 3 }], insuranceBet: 0 }],
                 reveal: true,
-                currentState: states.dealerPeek.label,
+                currentState: mutations.dealerPeek.label,
             });
         });
     });
@@ -320,24 +322,24 @@ describe('states', () => {
             const state = {
                 ...baseState,
                 hands: [{ ...baseState.hands[0], bet: 1, cards: [{ value: 10 }, { value: 1 }] }],
-                currentState: states.dealCards.label,
+                currentState: mutations.dealCards.label,
             };
-            expect(states.playerPlay.mutate(state, { blackjackPays: 3 / 2 })).toEqual({
+            expect(mutations.playerPlay.mutate(state, { blackjackPays: 3 / 2 })).toEqual({
                 ...baseState,
                 bank: -1.5,
                 hands: [{ ...state.hands[0], bet: 2.5, completed: true, settled: true }],
-                currentState: states.playerPlay.label,
+                currentState: mutations.playerPlay.label,
             });
         });
         test('player does not have a blackjack', () => {
             const state = {
                 ...baseState,
                 hands: [{ ...baseState.hands[0], bet: 1, cards: [{ value: 10 }, { value: 2 }] }],
-                currentState: states.dealCards.label,
+                currentState: mutations.dealCards.label,
             };
-            expect(states.playerPlay.mutate(state, { blackjackPays: 3 / 2 })).toEqual({
+            expect(mutations.playerPlay.mutate(state, { blackjackPays: 3 / 2 })).toEqual({
                 ...state,
-                currentState: states.playerPlay.label,
+                currentState: mutations.playerPlay.label,
             });
         });
     });
@@ -350,15 +352,15 @@ describe('states', () => {
                 dealerCards: [{ value: 10 }, { value: 6 }],
                 reveal: false,
                 dealerActionComplete: false,
-                currentState: states.playerPlay.label,
+                currentState: mutations.playerPlay.label,
             };
-            expect(states.dealerPlay.mutate(state, { dealerHitsSoft17: true })).toEqual({
+            expect(mutations.dealerPlay.mutate(state, { dealerHitsSoft17: true })).toEqual({
                 ...baseState,
                 shoe: [],
                 dealerCards: [{ value: 10 }, { value: 6 }, { value: 5 }],
                 reveal: true,
                 dealerActionComplete: true,
-                currentState: states.dealerPlay.label,
+                currentState: mutations.dealerPlay.label,
             });
         });
         test('dealer with hard 17 should not hit', () => {
@@ -367,15 +369,15 @@ describe('states', () => {
                 shoe: [{ value: 5 }],
                 dealerCards: [{ value: 10 }, { value: 7 }],
                 dealerActionComplete: false,
-                currentState: states.playerPlay.label,
+                currentState: mutations.playerPlay.label,
             };
-            expect(states.dealerPlay.mutate(state, { dealerHitsSoft17: true })).toEqual({
+            expect(mutations.dealerPlay.mutate(state, { dealerHitsSoft17: true })).toEqual({
                 ...baseState,
                 reveal: true,
                 shoe: [{ value: 5 }],
                 dealerCards: [{ value: 10 }, { value: 7 }],
                 dealerActionComplete: true,
-                currentState: states.dealerPlay.label,
+                currentState: mutations.dealerPlay.label,
             });
         });
         test('dealer with soft 17 should hit', () => {
@@ -384,15 +386,15 @@ describe('states', () => {
                 shoe: [{ value: 4 }],
                 dealerCards: [{ value: 1 }, { value: 6 }],
                 dealerActionComplete: false,
-                currentState: states.playerPlay.label,
+                currentState: mutations.playerPlay.label,
             };
-            expect(states.dealerPlay.mutate(state, { dealerHitsSoft17: true })).toEqual({
+            expect(mutations.dealerPlay.mutate(state, { dealerHitsSoft17: true })).toEqual({
                 ...baseState,
                 reveal: true,
                 shoe: [],
                 dealerCards: [{ value: 1 }, { value: 6 }, { value: 4 }],
                 dealerActionComplete: true,
-                currentState: states.dealerPlay.label,
+                currentState: mutations.dealerPlay.label,
             });
         });
         test('dealer with hard 18 should not hit', () => {
@@ -401,15 +403,15 @@ describe('states', () => {
                 shoe: [{ value: 5 }],
                 dealerCards: [{ value: 10 }, { value: 8 }],
                 dealerActionComplete: false,
-                currentState: states.playerPlay.label,
+                currentState: mutations.playerPlay.label,
             };
-            expect(states.dealerPlay.mutate(state, { dealerHitsSoft17: true })).toEqual({
+            expect(mutations.dealerPlay.mutate(state, { dealerHitsSoft17: true })).toEqual({
                 ...baseState,
                 reveal: true,
                 shoe: [{ value: 5 }],
                 dealerCards: [{ value: 10 }, { value: 8 }],
                 dealerActionComplete: true,
-                currentState: states.dealerPlay.label,
+                currentState: mutations.dealerPlay.label,
             });
         });
         test('dealer with soft 17 and !dealerHitsSoft17 should not hit', () => {
@@ -418,18 +420,143 @@ describe('states', () => {
                 shoe: [{ value: 4 }],
                 dealerCards: [{ value: 1 }, { value: 6 }],
                 dealerActionComplete: false,
-                currentState: states.playerPlay.label,
+                currentState: mutations.playerPlay.label,
             };
-            expect(states.dealerPlay.mutate(state, { dealerHitsSoft17: false })).toEqual({
+            expect(mutations.dealerPlay.mutate(state, { dealerHitsSoft17: false })).toEqual({
                 ...baseState,
                 reveal: true,
                 shoe: [{ value: 4 }],
                 dealerCards: [{ value: 1 }, { value: 6 }],
                 dealerActionComplete: true,
-                currentState: states.dealerPlay.label,
+                currentState: mutations.dealerPlay.label,
             });
         });
     });
 
-    // todo Add tests for settleBets.
+    describe('settleBets', () => {
+
+        test('hand is already settled', () => {
+            const state = {
+                ...baseState,
+                bank: 1,
+                bankroll: 1,
+                hands: [{ bet: 1, settled: true }],
+            };
+            expect(mutations.settleBets.mutate(state)).toEqual({
+                ...baseState,
+                bank: 1,
+                bankroll: 1,
+                hands: [{ bet: 1, settled: true }],
+                currentState: mutations.settleBets.label,
+            });
+        });
+
+        test('both dealer and player have blackjack', () => {
+            const state = {
+                ...baseState,
+                bank: 1,
+                bankroll: 1,
+                hands: [{ bet: 1, cards: [{ value: 1 }, { value: 10 }], settled: false }],
+                dealerCards: [{ value: 1 }, { value: 10 }],
+            };
+            expect(mutations.settleBets.mutate(state)).toEqual({
+                ...baseState,
+                bank: 1,
+                bankroll: 1,
+                hands: [{ bet: 1, cards: [{ value: 1 }, { value: 10 }], settled: true }],
+                dealerCards: [{ value: 1 }, { value: 10 }],
+                currentState: mutations.settleBets.label,
+            });
+        });
+
+        test('dealer has a blackjack and the player does not', () => {
+            const state = {
+                ...baseState,
+                bank: 1,
+                bankroll: 1,
+                hands: [{ bet: 1, cards: [{ value: 6 }, { value: 10 }], settled: false }],
+                dealerCards: [{ value: 1 }, { value: 10 }],
+            };
+            expect(mutations.settleBets.mutate(state)).toEqual({
+                ...baseState,
+                bank: 2,
+                bankroll: 1,
+                hands: [{ bet: 0, cards: [{ value: 6 }, { value: 10 }], settled: true }],
+                dealerCards: [{ value: 1 }, { value: 10 }],
+                currentState: mutations.settleBets.label,
+            });
+        });
+
+        test('dealer has busted and the player did not', () => {
+            const state = {
+                ...baseState,
+                bank: 1,
+                bankroll: 1,
+                hands: [{ bet: 1, cards: [{ value: 6 }, { value: 10 }], settled: false }],
+                dealerCards: [{ value: 6 }, { value: 10 }, { value: 10 }],
+            };
+            expect(mutations.settleBets.mutate(state)).toEqual({
+                ...baseState,
+                bank: 0,
+                bankroll: 1,
+                hands: [{ bet: 2, cards: [{ value: 6 }, { value: 10 }], settled: true }],
+                dealerCards: [{ value: 6 }, { value: 10 }, { value: 10 }],
+                currentState: mutations.settleBets.label,
+            });
+        });
+
+        test('player pushes', () => {
+            const state = {
+                ...baseState,
+                bank: 1,
+                bankroll: 1,
+                hands: [{ bet: 1, cards: [{ value: 7 }, { value: 10 }], settled: false }],
+                dealerCards: [{ value: 7 }, { value: 10 }],
+            };
+            expect(mutations.settleBets.mutate(state)).toEqual({
+                ...baseState,
+                bank: 1,
+                bankroll: 1,
+                hands: [{ bet: 1, cards: [{ value: 7 }, { value: 10 }], settled: true }],
+                dealerCards: [{ value: 7 }, { value: 10 }],
+                currentState: mutations.settleBets.label,
+            });
+        });
+
+        test('dealer wins', () => {
+            const state = {
+                ...baseState,
+                bank: 1,
+                bankroll: 1,
+                hands: [{ bet: 1, cards: [{ value: 7 }, { value: 10 }], settled: false }],
+                dealerCards: [{ value: 8 }, { value: 10 }],
+            };
+            expect(mutations.settleBets.mutate(state)).toEqual({
+                ...baseState,
+                bank: 2,
+                bankroll: 1,
+                hands: [{ bet: 0, cards: [{ value: 7 }, { value: 10 }], settled: true }],
+                dealerCards: [{ value: 8 }, { value: 10 }],
+                currentState: mutations.settleBets.label,
+            });
+        });
+
+        test('player wins', () => {
+            const state = {
+                ...baseState,
+                bank: 1,
+                bankroll: 1,
+                hands: [{ bet: 1, cards: [{ value: 8 }, { value: 10 }], settled: false }],
+                dealerCards: [{ value: 7 }, { value: 10 }],
+            };
+            expect(mutations.settleBets.mutate(state)).toEqual({
+                ...baseState,
+                bank: 0,
+                bankroll: 1,
+                hands: [{ bet: 2, cards: [{ value: 8 }, { value: 10 }], settled: true }],
+                dealerCards: [{ value: 7 }, { value: 10 }],
+                currentState: mutations.settleBets.label,
+            });
+        });
+    });
 });

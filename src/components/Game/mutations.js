@@ -1,33 +1,30 @@
 import { getRandomNumberInRange } from '../../utils/random';
-import { getDeck } from '../../utils/cards';
-
-const isSoft = cards => cards.reduce((sum, card) => sum + card.value, 0) < 12 && cards.filter(card => card.value === 1).length > 0;
-const isBusted = cards => handValue(cards) > 21;
-const getUpCardValue = cards => cards?.[1]?.value;
-const isBlackjack = cards => cards.length === 2 && handValue(cards) === 21;
-const handValue = cards => {
-    const sum = cards.reduce((sum, card) => sum + card.value, 0); // Aces are counted as 1.
-
-    if (sum > 11) {
-        return sum;
-    }
-
-    if (cards.filter(card => card.value === 1).length > 0) { // Hand contains >= 1 Ace.
-        return sum + 10;
-    }
-    
-    return sum;
-};
+import {
+    getDeck,
+    isSoft,
+    isBusted,
+    getUpCardValue,
+    isBlackjack,
+    handValue,
+} from '../../utils/cards';
 
 /*
     todo:
         Add disabled to buttons.
-        Hands are played in reverse order.
         Add a button to each hand to remove it.
 
 */
 
-const states = {
+const newHand = {
+    bet: 0,
+    cards: [],
+    insuranceBet: 0,
+    completed: false,
+    settled: true,
+    offerInsurance: false,
+};
+
+const mutations = {
     addHand: {
         label: 'addHand',
         mutate: state => {
@@ -36,17 +33,20 @@ const states = {
                 return state;
             }
 
-            hands.push({
-                bet: 0,
-                cards: [],
-                insuranceBet: 0,
-                completed: false,
-                settled: true,
-                offerInsurance: false,
-            });
+            hands.push({ ...newHand });
+
+            return { ...state, hands };
+        },
+    },
+    removeHand: {
+        label: 'removeHand',
+        mutate: (state, handIndex) => {
+            if (state.hands.length < 2) {
+                return state;
+            }
             return {
                 ...state,
-                hands,
+                hands: [ ...state.hands ].filter((hand, index) => index !== handIndex),
             };
         },
     },
@@ -92,9 +92,8 @@ const states = {
     surrender: {
         label: 'surrender',
         mutate: (state, handIndex, configuration) => {
-            const { surrenderCost } = configuration;
             const bet = state.hands[handIndex].bet;
-            const amount = bet * surrenderCost;
+            const amount = bet / 2;
 
             return {
                 ...state,
@@ -184,7 +183,7 @@ const states = {
     betInsurance: {
         label: 'betInsurance',
         mutate: (state, handIndex, configuration) => {
-            const amount = state.hands[handIndex].bet * configuration.insuranceCost;
+            const amount = state.hands[handIndex].bet / 2;
             return {
                 ...state,
                 bankroll: state.bankroll - amount,
@@ -215,9 +214,8 @@ const states = {
                 settled: true,
                 offerInsurance: false,
             })),
-            reveal: false,
             dealerActionComplete: true,
-            currentState: states.idle.label,
+            currentState: mutations.idle.label,
         }),
     },
     dealCards: {
@@ -250,7 +248,7 @@ const states = {
             shoe.pop(); // Burn a card.
 
             // Deal two cards to each player and the dealer.
-            const hands = [ ...state.hands ].map(hand => ({ ...hand, cards: [], completed: false, settled: false}));
+            const hands = [ ...state.hands ].filter(hand => !hand.splitHand).map(hand => ({ ...hand, cards: [], completed: false, settled: false}));
             let dealerCards = [];
             for (let i = 0; i < 2; i++) {
                 hands.forEach(hand => hand.cards.push(shoe.pop()));
@@ -264,7 +262,7 @@ const states = {
                 dealerCards,
                 reveal: false,
                 dealerActionComplete: false,
-                currentState: states.dealCards.label
+                currentState: mutations.dealCards.label
             };
         },
     },
@@ -273,14 +271,14 @@ const states = {
         mutate: state => ({
             ...state,
             hands: [ ...state.hands ].map(hand => ({ ...hand, offerInsurance: true })),
-            currentState: states.offerInsurance.label,
+            currentState: mutations.offerInsurance.label,
         }),
     },
     waitInsurance: {
         label: 'waitInsurance',
         mutate: state => ({
             ...state,
-            currentState: states.waitInsurance.label,
+            currentState: mutations.waitInsurance.label,
         }),
     },
     dealerPeek: {
@@ -291,7 +289,6 @@ const states = {
             // Settle all outstanding insurance bets.
             let bank = state.bank;
             let bankroll = state.bankroll;
-            const { insurancePays } = configuration;
             let hands = [ ...state.hands ];
 
             if (getUpCardValue(state.dealerCards) === 1) { // Dealer is showing an Ace.
@@ -301,8 +298,7 @@ const states = {
                     }
 
                     if (dealerHasBlackjack) {
-                        console.log('The player won the insurance bet.');
-                        const amountWon = hand.insuranceBet * insurancePays;
+                        const amountWon = hand.insuranceBet * 2;
                         bank -= amountWon;
                         bankroll += amountWon;
                         bankroll += hand.insuranceBet;
@@ -312,7 +308,6 @@ const states = {
                         };
                     }
     
-                    console.log('The player lost the insurance bet.');
                     bank += hand.insuranceBet;
                     return {
                         ...hand,
@@ -327,7 +322,7 @@ const states = {
                 bankroll,
                 hands,
                 reveal: dealerHasBlackjack,
-                currentState: states.dealerPeek.label,
+                currentState: mutations.dealerPeek.label,
             };
         },
     },
@@ -335,8 +330,10 @@ const states = {
         label: 'playerPlay',
         mutate: (state, configuration) => {
             const { blackjackPays } = configuration;
+            const shoe = [ ...state.shoe ];
             let bank = state.bank;
             const hands = [ ...state.hands ].map(hand => {
+
                 if (isBlackjack(hand.cards)) {
                     const bet = hand.bet;
                     const amountWon = bet * blackjackPays;
@@ -348,9 +345,10 @@ const states = {
 
             return {
                 ...state,
+                shoe,
                 bank,
                 hands: hands.map(hand => ({ ...hand })),
-                currentState: states.playerPlay.label,
+                currentState: mutations.playerPlay.label,
             };
         },
     },
@@ -376,7 +374,7 @@ const states = {
                 dealerCards,
                 reveal: true,
                 dealerActionComplete: true,
-                currentState: states.dealerPlay.label,
+                currentState: mutations.dealerPlay.label,
             };
         },
     },
@@ -391,31 +389,31 @@ const states = {
 
                 if (isBlackjack(state.dealerCards)) {
                     if (isBlackjack(hand.cards)) {
-                        return hand;
+                        return { ...hand, settled: true };
                     }
                     bank += hand.bet;
-                    return { ...hand, bet: 0 };
+                    return { ...hand, bet: 0, settled: true };
                 }
 
                 if (isBusted(state.dealerCards) && !isBusted(hand.cards)) {
                     const amountWon = hand.bet;
                     bank -= amountWon;
-                    return { ...hand, bet: hand.bet + amountWon };
+                    return { ...hand, bet: hand.bet + amountWon, settled: true };
                 }
 
                 if (handValue(state.dealerCards) === handValue(hand.cards)) {
-                    return hand;
+                    return { ...hand, settled: true };
                 }
 
                 if (handValue(state.dealerCards) > handValue(hand.cards)) {
                     bank += hand.bet;
-                    return { ...hand, bet: 0 };
+                    return { ...hand, bet: 0, settled: true };
                 }
 
                 if (handValue(hand.cards) > handValue(state.dealerCards)) {
                     const amountWon = hand.bet;
                     bank -= amountWon;
-                    return { ...hand, bet: hand.bet + amountWon };
+                    return { ...hand, bet: hand.bet + amountWon, settled: true };
                 }
 
                 throw new Error('A hand is in an invalid state.');
@@ -425,10 +423,39 @@ const states = {
                 ...state,
                 bank,
                 hands,
-                currentState: states.settleBets.label,
+                currentState: mutations.settleBets.label,
+            };
+        },
+    },
+    split: {
+        label: 'split',
+        mutate: (state, handIndex) => {
+            const originalHand = { ...state.hands[handIndex] };
+            originalHand.cards = [ ...originalHand.cards ];
+
+            const splitHand = { ...originalHand, cards: [], splitHand: true };
+
+            splitHand.cards.push(originalHand.cards.pop());
+
+            const hands = state.hands.map((hand, index) => index === handIndex ? originalHand : hand);
+
+            // const shoe = [ ...state.shoe ];
+            // splitHand.cards.push(shoe.pop());
+
+            // if (handIndex === 0) {
+            //     hands.unshift(splitHand);
+            // } else {
+                hands.splice(handIndex, 0, splitHand);
+            // }
+
+            return {
+                ...state,
+                // shoe,
+                hands,
+                bankroll: state.bankroll - originalHand.bet,
             };
         },
     },
 };
 
-export default states;
+export default mutations;
