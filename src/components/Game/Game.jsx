@@ -262,7 +262,8 @@ export const Game = () => {
                 }}>
                     <Box sx={{
                         backgroundColor: 'feltGreen',
-                        border: 'solid 1px black',
+                        border: 'solid 2px',
+                        borderColor: 'darkGreen',
                         borderRadius: '0.5rem',
                         color: 'white',
                         boxShadow: '2px 2px 20px #333',
