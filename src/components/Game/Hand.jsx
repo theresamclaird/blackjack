@@ -39,7 +39,7 @@ const Hand = ({
                     </React.Fragment>
                 ))}
             </Box>
-            <HandValue value={handValue(cards)} />
+            {/* <HandValue value={handValue(cards)} /> */}
             <Box sx={{
                 border: 'solid 2px',
                 borderColor: active ? 'yellow' : 'white',

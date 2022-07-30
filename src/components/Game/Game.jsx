@@ -1,4 +1,6 @@
 import React, { useReducer, useState } from 'react';
+import { createMachine, assign } from 'xstate';
+import { useMachine } from '@xstate/react';
 import { Box, Flex } from '../Box';
 import { Text } from '../Text';
 import Player from './Player';
@@ -83,6 +85,87 @@ const reducer = (state, action) => {
     }
 };
 
+const blackjackMachine = createMachine({
+    id: 'blackjack',
+    context: {
+        bank: 0,
+        bankroll: 0,
+        shoe: [],
+        hands: [{ bet: 0, cards: [], insuranceBet: 0 }],
+        dealerCards: [],
+    },
+    initial: 'idle',
+    states: {
+        idle: {
+            on: {
+                DEAL: { target: 'dealCards' },
+                INCREMENT_BET: {
+                    actions: [
+                        assign({
+                            bankroll: context => context.bankroll - 1,
+                            hands: (context, event) => context.hands.map((hand, index) => event.payload.handIndex === index ? { ...hand, bet: hand.bet + 1 } : hand),
+                        }),
+                    ],
+                },
+                DECREMENT_BET: {
+                    actions: [
+                        assign({
+                            bankroll: context => context.bankroll + 1,
+                            hands: (context, event) => context.hands.map((hand, index) => event.payload.handIndex === index ? { ...hand, bet: hand.bet - 1 } : hand),
+                        }),
+                    ],
+                },
+                CLEAR_BET: {
+                    actions: [
+                        assign((context, event) => {
+                            const { handIndex } = event.payload;
+                            const betAmount = context.hands[handIndex].bet;
+                            return {
+                                ...context,
+                                bankroll: context.bankroll + betAmount,
+                                hands: context.hands.map((hand, index) => index === handIndex ? { ...hand, bet: 0 } : hand),
+                            };
+                        }),
+                    ],
+                }
+            },
+        },
+        dealCards: {
+            on: {
+                ACE: { target: 'offerInsurance' },
+                TEN: { target: 'peek' },
+                NOT: { target: 'play' },
+            },
+        },
+        offerInsurance: {
+            on: {
+                COMPLETE: { target: 'peek' },
+            },
+        },
+        peek: {
+            on: {
+                BLACKJACK: { target: 'settle' },
+                NOT_BLACKJACK: { target: 'play' },
+            },
+        },
+        play: {
+            on: {
+                COMPLETE: { target: 'dealer' },
+            },
+        },
+        dealer: {
+            on: {
+                COMPLETE: { target: 'settle' },
+            },
+        },
+        settle: {
+            on: {
+                COMPLETE: { target: 'idle' },
+            },
+        },
+    },
+});
+  
 export const Game = () => {
     const [state, dispatch] = useReducer(reducer, {
         bank: 0,
@@ -113,6 +196,8 @@ export const Game = () => {
         double: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
     }));
     const [showConfiguration, setShowConfiguration] = useState(false);
+
+    const [machine, send] = useMachine(blackjackMachine);
 
     const totalBets = state.hands.reduce((sum, hand) => sum + hand.bet + hand.insuranceBet, 0);
     if (state.bank + state.bankroll + totalBets !== 0) {
@@ -238,19 +323,25 @@ export const Game = () => {
                     {...state}
                 />
                 <Player
-                    handValue={handValue}
-                    addHand={() => dispatch({ type: mutations.addHand.label })}
-                    removeHand={handIndex => dispatch({ type: mutations.removeHand.label, payload: { handIndex } })}
-                    incrementBet={handIndex => dispatch({ type: mutations.incrementBet.label, payload: { handIndex } })}
-                    decrementBet={handIndex => dispatch({ type: mutations.decrementBet.label, payload: { handIndex } })}
-                    clearBet={handIndex => dispatch({ type: mutations.clearBet.label, payload: { handIndex } })}
-                    deal={() => dispatch({ type: mutations.dealCards.label, payload: { configuration } })}
-                    stand={handIndex => dispatch({ type: mutations.stand.label, payload: { handIndex } })}
-                    hit={handIndex => dispatch({ type: mutations.hit.label, payload: { handIndex } })}
-                    surrender={handIndex => dispatch({ type: mutations.surrender.label, payload: { handIndex, configuration } })}
-                    double={handIndex => dispatch({ type: mutations.double.label, payload: { handIndex } })}
-                    split={handIndex => dispatch({ type: mutations.split.label, payload: { handIndex } })}
-                    {...state}
+                    // handValue={handValue}
+                    // addHand={() => dispatch({ type: mutations.addHand.label })}
+                    // removeHand={handIndex => dispatch({ type: mutations.removeHand.label, payload: { handIndex } })}
+                    // incrementBet={handIndex => dispatch({ type: mutations.incrementBet.label, payload: { handIndex } })}
+                    incrementBet={handIndex => send({ type: 'INCREMENT_BET', payload: { handIndex } })}
+                    // decrementBet={handIndex => dispatch({ type: mutations.decrementBet.label, payload: { handIndex } })}
+                    decrementBet={handIndex => send({ type: 'DECREMENT_BET', payload: { handIndex } })}
+                    // clearBet={handIndex => dispatch({ type: mutations.clearBet.label, payload: { handIndex } })}
+                    clearBet={handIndex => send({ type: 'CLEAR_BET', payload: { handIndex } })}
+                    // deal={() => dispatch({ type: mutations.dealCards.label, payload: { configuration } })}
+                    deal={() => send('DEAL')}
+                    // stand={handIndex => dispatch({ type: mutations.stand.label, payload: { handIndex } })}
+                    // hit={handIndex => dispatch({ type: mutations.hit.label, payload: { handIndex } })}
+                    // surrender={handIndex => dispatch({ type: mutations.surrender.label, payload: { handIndex, configuration } })}
+                    // double={handIndex => dispatch({ type: mutations.double.label, payload: { handIndex } })}
+                    // split={handIndex => dispatch({ type: mutations.split.label, payload: { handIndex } })}
+                    // {...state}
+                    machine={machine}
+
                 />
             </Flex>
             {showConfiguration && (
