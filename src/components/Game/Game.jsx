@@ -12,10 +12,9 @@ import { getHandValue } from '../../utils/cards';
 /*
     todo:
         - Indicate which hand is being offered insurance.
-        - Add unit tests for new functionality.
-        - Allow blackjack hands to act (e.g. double) before settling.
+        - Find a better place/way? to render the "Accept" and "Decline" buttons for insurance.
+        - Add unit tests.
         - Add "double" array to configuration panel.
-        - Make the configuration panel a component.
 */
 
 export const Game = () => {
@@ -55,10 +54,11 @@ export const Game = () => {
                         <Text sx={{ color: 'yellow' }}>{`Shoe: ${machine.context.shoe.length} cards`}</Text>
                     </Flex>
                 </Flex>
-                <Dealer getHandValue={getHandValue} {...machine} />
+                <Dealer getHandValue={getHandValue} dealerCards={machine.context.dealerCards} currentState={machine.value} />
                 <Table />
                 <Player
                     getHandValue={getHandValue}
+                    currentState={machine.value}
                     deal={() => send({ type: 'DEAL', payload: { configuration } })}
                     addHand={() => send({ type: 'ADD_HAND' })}
                     removeHand={handIndex => send({ type: 'REMOVE_HAND', payload: { handIndex } })}
@@ -66,14 +66,13 @@ export const Game = () => {
                     decrementBet={handIndex => send({ type: 'DECREMENT_BET', payload: { handIndex, configuration } })}
                     clearBet={handIndex => send({ type: 'CLEAR_BET', payload: { handIndex, configuration } })}
                     acceptInsuranceBet={handIndex => send({ type: 'ACCEPT', payload: { handIndex, configuration } })}
-                    declineInsurance={handIndex => send({ type: 'DECLINE', payload: { handIndex, configuration } })}
+                    declineInsuranceBet={handIndex => send({ type: 'DECLINE', payload: { handIndex, configuration } })}
                     stand={handIndex => send({ type: 'STAND', payload: { handIndex } })}
                     hit={handIndex => send({ type: 'HIT', payload: { handIndex } })}
                     surrender={handIndex => send({ type:'SURRENDER', payload: { handIndex, configuration } })}
                     double={handIndex => send({ type: 'DOUBLE', payload: { handIndex } })}
                     split={handIndex => send({ type: 'SPLIT', payload: { handIndex } })}
                     machine={machine}
-
                 />
             </Flex>
             {showConfiguration && (

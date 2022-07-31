@@ -54,8 +54,8 @@ createMachine({
     offerInsurance: {
       entry: "offerInsurance",
       on: {
-        ACCEPT: { actions: "acceptInsurance" },
-        DECLINE: { actions: "declineInsurance" },
+        ACCEPT: { actions: "acceptInsuranceBet" },
+        DECLINE: { actions: "declineInsuranceBet" },
       },
       always: [{ cond: "allHandsResponded", target: "peek" }],
     },
@@ -164,7 +164,7 @@ createMachine({
             ...context,
             hands: [ ...context.hands ].map(hand => ({ ...hand, offerInsurance: true })),
         })),
-        acceptInsurance: assign((context, event) => {
+        acceptInsuranceBet: assign((context, event) => {
             const { handIndex } = event.payload;
             const insuranceBet = context.hands[handIndex].bet / 2;
             return {
@@ -173,7 +173,7 @@ createMachine({
                 hands: [ ...context.hands ].map((hand, index) => index === handIndex ? { ...hand, insuranceBet, offerInsurance: false } : hand),
             };
         }),
-        declineInsurance: assign((context, event) => {
+        declineInsuranceBet: assign((context, event) => {
             const { handIndex } = event.payload;
             return {
                 ...context,

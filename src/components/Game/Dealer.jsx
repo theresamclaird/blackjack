@@ -3,7 +3,7 @@ import Box, { Flex } from '../Box';
 import Card from './Card';
 import HandValue from './HandValue';
 
-const Dealer = ({ getHandValue, ...machine }) => (
+const Dealer = ({ getHandValue, dealerCards, currentState }) => (
     <Flex sx={{
         flexDirection: 'column',
         justifyContent: 'flex-start',
@@ -27,14 +27,14 @@ const Dealer = ({ getHandValue, ...machine }) => (
                 justifyContent: 'center',
                 gap: '1rem',
             }}>
-                {machine?.context?.dealerCards.map((card, index) => (
+                {dealerCards.map((card, index) => (
                     <React.Fragment key={`dealer-card-${index}`}>
-                        <Card showBack={index === 0 && machine.value !== 'idle'} {...card} />
+                        <Card showBack={index === 0 && currentState !== 'idle'} {...card} />
                     </React.Fragment>
                 ))}
             </Flex>
         </Box>
-        <HandValue value={getHandValue(machine?.context?.dealerCards || [])} />
+        <HandValue value={getHandValue(dealerCards || [])} />
     </Flex>
 );
 

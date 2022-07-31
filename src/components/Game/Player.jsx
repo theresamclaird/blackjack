@@ -6,6 +6,7 @@ import Hand from './Hand';
 
 const Player = ({
     getHandValue,
+    currentState,
     addHand,
     removeHand,
     incrementBet,
@@ -21,15 +22,15 @@ const Player = ({
     split,
     machine,
 }) => {
-    // const activeHandIndex = machine.playerHands.findLastIndex(hand => !hand.completed);
+    const activeHandIndex = machine.context.hands.findLastIndex(hand => !hand.completed);
     return (
         <Flex sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '5rem' }}>
             <Flex sx={{ flexDirection: 'row', justifyContent: 'space-around', gap: '5rem' }}>
                 {machine.context.hands.map((hand, handIndex) => (
                     <React.Fragment key={`${handIndex}-${JSON.stringify(hand)}`}>
                         <Hand
-                            // active={handIndex === activeHandIndex}
-                            active={true}
+                            active={handIndex === activeHandIndex}
+                            currentState={currentState}
                             getHandValue={getHandValue}
                             removeHand={() => removeHand(handIndex)}
                             incrementBet={() => incrementBet(handIndex)}
@@ -42,9 +43,6 @@ const Player = ({
                             surrender={() => surrender(handIndex)}
                             double={() => double(handIndex)}
                             split={() => split(handIndex)}
-                            // currentState={currentState}
-                            currentState={'idle'}
-                            numberOfHands={1}
                             {...hand}
                         />
                     </React.Fragment>
