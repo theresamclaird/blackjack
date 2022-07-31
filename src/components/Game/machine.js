@@ -159,7 +159,7 @@ createMachine({
         allHandsSettled: ({ hands }) => hands.filter(hand => !hand.settled).length < 1,
         maxHands: ({ hands }) => hands.length < 7,
         minHands: ({ hands }) => hands.length > 1,
-        handNeedsSecondCard: ({ currentHandIndex, hands }) => hands[currentHandIndex].split && hands[currentHandIndex].cards.length === 1,
+        handNeedsSecondCard: ({ currentHandIndex, hands }) => hands[currentHandIndex].cards.length === 1,
     },
     actions: {
         reset: assign(context => ({
@@ -202,7 +202,7 @@ createMachine({
             }
 
             const hands = [ ...context.hands ]
-                .filter(hand => !hand.splitHand)
+                .filter(hand => !hand.split)
                 .map(hand => ({
                     ...hand,
                     cards: [],
@@ -434,7 +434,7 @@ createMachine({
         splitHand: assign((context, event) => {
             const { handIndex } = event.payload;
 
-            const originalHand = { ...context.hands[handIndex], split: true };
+            const originalHand = { ...context.hands[handIndex] };
             originalHand.cards = [ ...originalHand.cards ];
 
             const splitHand = { ...originalHand, cards: [], split: true };
