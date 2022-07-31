@@ -1,12 +1,14 @@
 import React from 'react';
 import Box, { Flex } from '../Box';
-import HandValue from './HandValue';
+import { Text } from '../Text';
 import Card from './Card';
+import { getHandValue } from '../../utils/cards';
 
 const Hand = ({
+    canRemoveHand,
     active,
     currentState,
-    getHandValue,
+    hand,
     removeHand,
     incrementBet,
     decrementBet,
@@ -18,10 +20,11 @@ const Hand = ({
     surrender,
     double,
     split,
-    bet,
-    cards,
-    settled,
 }) => {
+    const value = getHandValue(hand.cards);
+    const isInitial = hand.cards.length === 2; // todo Do not count split hands.
+    const canSplit = isInitial && hand.cards[0].value === hand.cards[1].value;
+    const isBlackjack = isInitial && value === 21;
     return (
         <Flex sx={{
             mt: '1rem',
@@ -31,17 +34,17 @@ const Hand = ({
             gap: '1em',
         }}>
             <Flex sx={{ justifyContent: 'center', gap: '10rem' }}>
-                <Box disabled={currentState !== 'offerInsurance'} onClick={() => acceptInsuranceBet()} as="button">Accept</Box>
-                <Box disabled={currentState !== 'offerInsurance'} onClick={() => declineInsuranceBet()} as="button">Decline</Box>
+                <Box disabled={!active || (currentState !== 'offerInsurance' && !hand.offerInsurance)} onClick={() => acceptInsuranceBet()} as="button">Accept</Box>
+                <Box disabled={!active || (currentState !== 'offerInsurance' && !hand.offerInsurance)} onClick={() => declineInsuranceBet()} as="button">Decline</Box>
             </Flex>
             <Box sx={{ position: 'relative', width: '8rem' }}>
-                {cards.map((card, index) => (
+                {hand.cards.map((card, index) => (
                     <React.Fragment key={`player-card-seat-${index}`}>
                         <Card {...card} sx={{ position: 'absolute', left: `${index + 1}rem`, bottom: `${index}rem` }} />
                     </React.Fragment>
                 ))}
             </Box>
-            <HandValue value={getHandValue(cards)} />
+            <Text sx={{ color: isBlackjack ? 'yellow' : 'white' }}>{isBlackjack ? 'Blackjack!' : value}</Text>
             <Box sx={{
                 border: 'solid 2px',
                 borderColor: active ? 'yellow' : 'white',
@@ -82,7 +85,7 @@ const Hand = ({
                                     color: 'white',
                                     fontWeight: '900',
                                     mx: 'sm',
-                                }}>{`¤ ${bet}`}</Box>
+                                }}>{`¤ ${hand.bet}`}</Box>
                             <Box disabled={currentState !== 'idle'} onClick={incrementBet} as="button">+</Box>
                         </Flex>
 
@@ -93,16 +96,16 @@ const Hand = ({
             </Box>
             <Flex sx={{ flexDirection: 'column', justifyContent: 'center', gap: '1rem' }}>
                 <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '0.5rem' }}>
-                    <Box  onClick={double} as="button">Double</Box>
-                    <Box  onClick={surrender} as="button">Surrender</Box>
-                    <Box onClick={split} as="button">Split</Box>
+                    <Box  disabled={!isInitial || !active || currentState !== 'player'} onClick={double} as="button">Double</Box>
+                    <Box  disabled={!isInitial || !active || currentState !== 'player'}  onClick={surrender} as="button">Surrender</Box>
+                    <Box  disabled={!canSplit || !active || currentState !== 'player'} onClick={split} as="button">Split</Box>
                 </Flex>
                 <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '0.5rem' }}>
-                    <Box onClick={hit} as="button">Hit</Box>
-                    <Box onClick={stand} as="button">Stand</Box>
+                    <Box  disabled={!active || currentState !== 'player'} onClick={hit} as="button">Hit</Box>
+                    <Box  disabled={!active || currentState !== 'player'} onClick={stand} as="button">Stand</Box>
                 </Flex>
                 <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '0.5rem' }}>
-                    <Box onClick={removeHand} as="button">- Hand</Box>
+                    <Box  disabled={!canRemoveHand || currentState !== 'idle'} onClick={removeHand} as="button">- Hand</Box>
                 </Flex>
             </Flex>
         </Flex>

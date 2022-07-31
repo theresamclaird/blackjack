@@ -29,11 +29,13 @@ createMachine({
     shoe: [],
     hands: [{ ...newHand }],
     dealerCards: [],
+    currentHandIndex: -1,
   },
   id: "blackjack",
   initial: "idle",
   states: {
     idle: {
+      entry: "reset",
       on: {
         DEAL: {
           target: "deal",
@@ -48,12 +50,12 @@ createMachine({
           actions: "clearBet",
         },
         ADD_HAND: {
-          actions: "addHand",
-          cond: "maxHands",
+            cond: "maxHands",
+            actions: "addHand",
         },
         REMOVE_HAND: {
-          actions: "removeHand",
-          cond: "minHands",
+            cond: "minHands",
+            actions: "removeHand",
         },
       },
     },
@@ -113,19 +115,19 @@ createMachine({
       ],
       on: {
         STAND: {
-          actions: "standHand",
+          actions: ["standHand", "setCurrentHandIndex"],
         },
         SURRENDER: {
-          actions: "surrenderHand",
+          actions: ["surrenderHand", "setCurrentHandIndex"],
         },
         HIT: {
-          actions: "hitHand",
+          actions: ["hitHand", "setCurrentHandIndex"],
         },
         DOUBLE: {
-          actions: "doubleHand",
+          actions: ["doubleHand", "setCurrentHandIndex"],
         },
         SPLIT: {
-          actions: "splitHand",
+          actions: ["splitHand", "setCurrentHandIndex"],
         },
       },
     },
@@ -155,6 +157,10 @@ createMachine({
         minHands: ({ hands }) => hands.length > 1,
     },
     actions: {
+        reset: assign(context => ({
+            ...context,
+            currentHandIndex: -1,
+        })),
         addHand: assign(context => {
             const hands = [ ...context.hands ];
             hands.push({ ...newHand });
@@ -195,7 +201,7 @@ createMachine({
                 .map(hand => ({
                     ...hand,
                     cards: [],
-                    completed: false,
+                    complete: false,
                     settled: false,
                 }));
 
@@ -216,6 +222,7 @@ createMachine({
         }),
         offerInsurance: assign(context => ({
             ...context,
+            currentHandIndex: context.hands.length - 1,
             hands: [ ...context.hands ].map(hand => ({ ...hand, offerInsurance: true })),
         })),
         acceptInsuranceBet: assign((context, event) => {
@@ -224,6 +231,7 @@ createMachine({
             return {
                 ...context,
                 bankroll: context.bankroll - insuranceBet,
+                currentHandIndex: handIndex - 1,
                 hands: [ ...context.hands ].map((hand, index) => index === handIndex ? { ...hand, insuranceBet, offerInsurance: false } : hand),
             };
         }),
@@ -231,12 +239,18 @@ createMachine({
             const { handIndex } = event.payload;
             return {
                 ...context,
+                currentHandIndex: handIndex - 1,
                 hands: [ ...context.hands ].map((hand, index) => index === handIndex ? { ...hand, offerInsurance: false } : hand),
             };
         }),
         initializeHands: assign(context => ({
             ...context,
+            currentHandIndex: [ ...context.hands ].findLastIndex(hand => !hand.complete && !hand.settled),
             hands: [ ...context.hands ].map(hand => ({ ...hand, complete: false, settled: false })),
+        })),
+        setCurrentHandIndex: assign(context => ({
+            ...context,
+            currentHandIndex: [ ...context.hands ].findLastIndex(hand => !hand.complete),
         })),
         playDealerHand: assign(context => {
             const { dealerHitsSoft17 } = context.configuration;
@@ -257,7 +271,10 @@ createMachine({
         }),
         settleBets: assign(context => {
             let bank = context.bank;
-            const hands = [ ...context.hands ].filter(hand => !hand.settled).map(hand => {
+            const hands = [ ...context.hands ].map(hand => {
+                if (hand.settled) {
+                    return hand;
+                }
 
                 if (isBlackjack(context.dealerCards)) {
                     if (isBlackjack(hand.cards)) {
@@ -291,11 +308,7 @@ createMachine({
                 throw new Error('A hand is in an invalid state.');
             });
 
-            return {
-                ...context,
-                bank,
-                hands,
-            };
+            return { ...context, bank, hands };
         }),
         standHand: assign((context, { payload: { handIndex } }) => {
             let hand = context.hands[handIndex];
@@ -309,7 +322,7 @@ createMachine({
                     hands: [ ...context.hands ].map((hand, index) => index === handIndex ? {
                         ...hand,
                         bet: bet + amountWon,
-                        completed: true,
+                        complete: true,
                         settled: true,
                     } : hand),
                 };
@@ -330,7 +343,7 @@ createMachine({
                 hands: context.hands.map((hand, index) => index === handIndex ? {
                     ...hand,
                     bet: bet - amount,
-                    completed: true,
+                    complete: true,
                     settled: true,
                 } : hand),
             };
@@ -350,7 +363,7 @@ createMachine({
                         ...hand,
                         cards,
                         bet: 0,
-                        completed: true,
+                        complete: true,
                         settled: true,
                     } : hand),
                 };
@@ -387,7 +400,7 @@ createMachine({
                         ...hand,
                         cards,
                         bet: 0,
-                        completed: true,
+                        complete: true,
                         settled: true,
                     } : hand),
                     shoe,

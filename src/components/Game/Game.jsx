@@ -3,6 +3,7 @@ import { useMachine } from '@xstate/react';
 import { Flex } from '../Box';
 import { Text } from '../Text';
 import Player from './Player';
+import Hand from './Hand';
 import Table from './Table';
 import Dealer from './Dealer';
 import Configuration from './Configuration';
@@ -11,7 +12,6 @@ import { getHandValue } from '../../utils/cards';
 
 /*
     todo:
-        - Indicate which hand is being offered insurance.
         - Find a better place/way? to render the "Accept" and "Decline" buttons for insurance.
         - Add unit tests.
         - Add "double" array to configuration panel.
@@ -56,22 +56,32 @@ export const Game = () => {
             <Dealer getHandValue={getHandValue} dealerCards={machine.context.dealerCards} currentState={machine.value} />
             <Table />
             <Player
+                currentHandIndex={machine?.context?.currentHandIndex}
                 getHandValue={getHandValue}
                 currentState={machine.value}
                 deal={() => send({ type: 'DEAL', payload: { configuration } })}
                 addHand={() => send({ type: 'ADD_HAND' })}
-                removeHand={handIndex => send({ type: 'REMOVE_HAND', payload: { handIndex } })}
-                incrementBet={handIndex => send({ type: 'INCREMENT_BET', payload: { handIndex, configuration } })}
-                decrementBet={handIndex => send({ type: 'DECREMENT_BET', payload: { handIndex, configuration } })}
-                clearBet={handIndex => send({ type: 'CLEAR_BET', payload: { handIndex, configuration } })}
-                acceptInsuranceBet={handIndex => send({ type: 'ACCEPT', payload: { handIndex, configuration } })}
-                declineInsuranceBet={handIndex => send({ type: 'DECLINE', payload: { handIndex, configuration } })}
-                stand={handIndex => send({ type: 'STAND', payload: { handIndex } })}
-                hit={handIndex => send({ type: 'HIT', payload: { handIndex } })}
-                surrender={handIndex => send({ type:'SURRENDER', payload: { handIndex, configuration } })}
-                double={handIndex => send({ type: 'DOUBLE', payload: { handIndex } })}
-                split={handIndex => send({ type: 'SPLIT', payload: { handIndex } })}
-                machine={machine}
+                bankroll={machine?.context?.bankroll}
+                hands={machine?.context?.hands}
+                renderHand={handIndex => (
+                    <Hand
+                        canRemoveHand={machine?.context?.hands.length > 1}
+                        active={handIndex === machine?.context?.currentHandIndex}
+                        currentState={machine?.value}
+                        hand={machine?.context?.hands?.[handIndex]}
+                        removeHand={() => send({ type: 'REMOVE_HAND', payload: { handIndex } })}
+                        incrementBet={() => send({ type: 'INCREMENT_BET', payload: { handIndex, configuration } })}
+                        decrementBet={() => send({ type: 'DECREMENT_BET', payload: { handIndex, configuration } })}
+                        clearBet={() => send({ type: 'CLEAR_BET', payload: { handIndex, configuration } })}
+                        acceptInsuranceBet={() => send({ type: 'ACCEPT', payload: { handIndex, configuration } })}
+                        declineInsuranceBet={() => send({ type: 'DECLINE', payload: { handIndex, configuration } })}
+                        stand={() => send({ type: 'STAND', payload: { handIndex } })}
+                        hit={() => send({ type: 'HIT', payload: { handIndex } })}
+                        surrender={() => send({ type:'SURRENDER', payload: { handIndex, configuration } })}
+                        double={() => send({ type: 'DOUBLE', payload: { handIndex } })}
+                        split={() => send({ type: 'SPLIT', payload: { handIndex } })}
+                    />
+                )}
             />
             <Configuration
                 show={showConfiguration}

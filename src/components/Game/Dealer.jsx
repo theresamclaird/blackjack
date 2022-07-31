@@ -34,7 +34,10 @@ const Dealer = ({ getHandValue, dealerCards, currentState }) => (
                 ))}
             </Flex>
         </Box>
-        <HandValue value={getHandValue(dealerCards || [])} />
+        <HandValue value={
+            currentState === 'player' ? // todo This is pretty ugly.
+                dealerCards[1].value === 1 ? '1/11' : dealerCards[1].value :
+                getHandValue(dealerCards || [])} />
     </Flex>
 );
 
