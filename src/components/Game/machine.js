@@ -21,7 +21,7 @@ const newHand = {
 };
 
 export const blackjackMachine = 
-/** @xstate-layout N4IgpgJg5mDOIC5QCMA2BDAxgawFZewDoBLCVMAYgBEBRAQQBlFQAHAe1mIBdi2A7ZiAAeiALQBGAJzjCANgBMAFgDM88fLXKAHOK3yANCACeYycpnjd8yZMWStABgDsT+QF83htAXw4SZSgBJADkAYQAlGgBZGmCAFQB9ACEaOMF2Th5+QREECQdHQgBWSVllIuUHcSKHIstDEzzLF0Jamy1FJVknSvdPEG8cXyJScmoaCOjYxJS0pBAM7l4BedzRaQdCcXNxWQcHWS0irWVFBrFmp1aS+w662RVFDy8MIYJ-MdCGenDk1PSOEtsqsxD1Ni5HDcdIoVOJzk1xC02rdFPdHs8Bq88O9RpQ6FQqAkABJ0YJUAGZZY5MTmeSEOySY67JxaVzVeESRF0+THcqORQHbpPfqDbF+XEUSJRADyADUaMTSeT5ossitQGs6spCPJZLtGTynLIijCOc1ubzDkUitYakUMaLhoQIGB0KgKBSgerhKZJPSSkVjZIeXUOhy9kVCE5BVUSrJJLGHVinWwAGapsAAJ0CfFgAFdM+g+Jg8aFQjQAApzViAtXUhDHSPKRmKDrxpytyROM3VP1FDu6WTtpyWWRJnzvNMZ7O5gtFkvjL4hGieusghBKP06e6M5QPHllHvG4rGvUHRTx6zicdvPxTrM5-OF4uUVdU9cX7VSWzacQMxySByLLaqcDhqEOF5VKyN5ikQLBgGA2AeiqtbvhqiAXk2n6qJuHZGrIZoHIQqhaF2DwHCaPJaDBTosBgRhZhQADKcRKm+wLoXkpyyDqsLSM2nTbFoHJXsU0bfta-aOD0NHvHR6AMZmzEAKrhJEZI0OE7Hems5R+gU8YqA4ML7gYxgXD0xRSGo0iojCGhjiKyZyfRjFEoE1YLKhHE+lxyhXPItRWgUurNmZjTrK0VH+WBl57Nssl+PJinUNKylJN82n1qI5SbFoxoHP5-lODc8LiLUrROF2tiKNUrbRk4iVwa5SlMRWDAeVl645Z0rR6rYRoGka4WIBoX6VMG2iMkO8h7k1hDJYxXWcRINQ6gcI7mCaPTWGc5kIHuVzWmYDwlbyNr2k5E5+C6bpLShlI+bkNRXNZ8g9H+zhVcJ+1DiBNVVf2li6MKLzXUQsBgFwXBjMtvmiKyMh1H+Wg6CyP7KPCejgrsSjlCD8jURifBsC68DzI6OIBHDawPDxVQODYhN7tYpEcgN9InNYJVCkOjlg7eRC3agNNiDC9L+e2VTmDoEbs+Luo2DUigdkOI7zfeM5PvOYCiwdjJbFInTDbqpGMuzOiG6yJx6FerjzfBiF6ya2rBkaYHqPsDw-RFdSKFG6OSwoqI6A7LV66IVWEDY0YnMo2iFWYHI2vSf6nNUhMmfH83C1mEfqPpJUqyOnSS-58JlDIVXbCZgb2DC82Q9D5B67H0d2DUlQnCUugV+YUb8QcOjvUGTX5+V-txuUlTVLU9T7RIm6tLVM-5boNpEx4QA */
+/** @xstate-layout N4IgpgJg5mDOIC5QCMA2BDAxgawFZewDoBLCVMAYgBEBRAQQBlFQAHAe1mIBdi2A7ZiAAeiALQBGAOyTCATgDMsqQBZx4gBwKADACZ5AGhABPMZpmSArBfmTZW8dZ2SAvs8NoC+HCTKUAkgByAMIASjQAsjQBACoA+gBCNNGC7Jw8-IIiCBJaAGy5cmo6WhZKOqWyuYYm2WrK8oS5spJ5NrmK6q7uGDheRKTk1DShEVFxiclIIKncvAJTWaKaBcrKufY6lbni8hrVYnUNTS25trnqmvI6XSAevQQ+g0EM9CEJSSkcsxkLYpJShC0sk24h06kkmiUFn2tXE9UazTyZwuCmubluPTwDwGlDoVCosQAEnQAlRPmk5pkxJt1IR1HD6soLJJcjomrIYRIdrTNBZ6pZmUp-jc7ljvDiKGFwgB5ABqNCJJLJUxm6XmoEWylkskIzNyfPpVmKYIMxgO3Lpsj5ynUWhaxV0IsxfUIEDA6FQFHJ33VwlMFkI0lWGnUejy53EnOZOkI8nqEbqDlBTs8DzYADN02AAE5+PiwACu2fQfEwuKCQRoAAVJqwvmqqQgKoDbe0pNrZKpTTUuWzCDoivkB1rtsoU-dvBms7n80WS2Whs9AjRvQ3fgg2Q0LFotLt8vILtIdJy1Fd+7omvZcqoIbJx2KiFOc3nC8XS5RV5T18oWXT1Ez1AscodHqcplE5SQtTkI9KnEdo2X-e8XRYMAwGwL0VXrL8NUQH8dV3OFbHkIDxG1bs-hjLYSlKPRbD0cQkIeFgMCMHMKAAZWiJVPx+HDsnkM8rFtVYQRZHRjzNbJylpYpJCcOxJHkXctDWRjvGY9BWOzDiAFUQjCUkaBCHjfUWOMA2UexbFKZQBzsdoT0swgHFZWR1CHJo0W6VN1JYtjCT8Wtpiw3i-X4vRdWKaxbFtDQWRhEDYxsLR1HMixQ1sixcjUogNK06hpR0+IXhMxtRAEmR2yUfdrBS8iEAtET-htNzaLjHLCDytj2KrBhAtK9dyrBWMWVtEpgQyqpJPKFYFH-fl-1BdoOq67SBr4iR5AKEisvWICwR2cDJMsrQ5HEsEgIPdKrA6t0PTY9awqA07wUg41QN2I6aiaApLEgncSgPc4XHRUUXVgMAuC4QZHsWQCZFDdpVDta9qphQDlEBWw4JOtQITRdE+DYN14CmMHsV8WGxHg2NpKZRSDx-CSeyUTHQV3aQUp-OD5Fu91UCp-jTssMDtXEO0lPsTklFOhTdA7Ui4M6UHnTTTNn1nN8y0FyyeRU5kmYsOEHGln9AyE9o4yvJoVtQ7BBasGRticLVzqN69ORtcRCFUdYpHbFoIWylWfNyvzs0F0R8ljNQFFZYjnbjE98KN2zxaZH68j5+6I8wilQsWNQA0UXdJcUYEf3UGF8gDBxbP1HZmjjEHvInIgIah8hBbkmMkf1ex3JU4jq-1Zy+XEuSrXdryMVDyPxbsQp2dKUEKimntQQcRp8fS8W2Wx1xXCAA */
 createMachine({
   context: {
     bank: 0,
@@ -50,12 +50,12 @@ createMachine({
           actions: "clearBet",
         },
         ADD_HAND: {
-            cond: "maxHands",
-            actions: "addHand",
+          actions: "addHand",
+          cond: "maxHands",
         },
         REMOVE_HAND: {
-            cond: "minHands",
-            actions: "removeHand",
+          actions: "removeHand",
+          cond: "minHands",
         },
       },
     },
@@ -112,6 +112,10 @@ createMachine({
           cond: "allHandsComplete",
           target: "dealer",
         },
+        {
+          cond: "handNeedsSecondCard",
+          actions: "addCardToHand"
+        },
       ],
       on: {
         STAND: {
@@ -155,6 +159,7 @@ createMachine({
         allHandsSettled: ({ hands }) => hands.filter(hand => !hand.settled).length < 1,
         maxHands: ({ hands }) => hands.length < 7,
         minHands: ({ hands }) => hands.length > 1,
+        handNeedsSecondCard: ({ currentHandIndex, hands }) => hands[currentHandIndex].split && hands[currentHandIndex].cards.length === 1,
     },
     actions: {
         reset: assign(context => ({
@@ -375,6 +380,17 @@ createMachine({
                 hands: context.hands.map((hand, index) => index === handIndex ? { ...hand, cards } : hand),
             };
         }),
+        addCardToHand: assign(context => {
+            const shoe = [ ...context.shoe ];
+            const { currentHandIndex } = context;
+            const cards = [ ...context.hands[currentHandIndex].cards ];
+            cards.push(shoe.pop());
+            return {
+                ...context,
+                shoe,
+                hands: context.hands.map((hand, index) => index === currentHandIndex ? { ...hand, cards, } : hand),
+            };
+        }),
         doubleHand: assign((context, { payload: { handIndex } }) => {
 
             const betAmount = context.hands[handIndex].bet;
@@ -418,11 +434,10 @@ createMachine({
         splitHand: assign((context, event) => {
             const { handIndex } = event.payload;
 
-            const originalHand = { ...context.hands[handIndex] };
+            const originalHand = { ...context.hands[handIndex], split: true };
             originalHand.cards = [ ...originalHand.cards ];
 
-            const splitHand = { ...originalHand, cards: [], splitHand: true };
-
+            const splitHand = { ...originalHand, cards: [], split: true };
             splitHand.cards.push(originalHand.cards.pop());
 
             const hands = context.hands.map((hand, index) => index === handIndex ? originalHand : hand);
@@ -433,7 +448,7 @@ createMachine({
                 ...context,
                 hands,
                 bankroll: context.bankroll - originalHand.bet,
-            };
+                                                    };
         }),
     },
 });

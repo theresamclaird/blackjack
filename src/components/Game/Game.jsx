@@ -15,6 +15,9 @@ import { getHandValue } from '../../utils/cards';
         - Find a better place/way? to render the "Accept" and "Decline" buttons for insurance.
         - Add unit tests.
         - Add "double" array to configuration panel.
+        - When the player wins a hand, replace the hand value with text "Winner".
+        - Fix accounting bug.
+        - Allow the player to scroll horizontally to see all hands.
 */
 
 export const Game = () => {

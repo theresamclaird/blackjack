@@ -22,7 +22,7 @@ const Hand = ({
     split,
 }) => {
     const value = getHandValue(hand.cards);
-    const isInitial = hand.cards.length === 2; // todo Do not count split hands.
+    const isInitial = hand.cards.length === 2 && !hand.isSplit; // todo Validate that this does not count split hands.
     const canSplit = isInitial && hand.cards[0].value === hand.cards[1].value;
     const isBlackjack = isInitial && value === 21;
     return (
