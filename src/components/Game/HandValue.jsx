@@ -1,6 +1,10 @@
 import React from 'react';
 import { Text } from '../Text';
+import { getHandValue } from '../../utils/cards';
 
-const HandValue = ({ value }) => <Text sx={{ color: 'white' }}>{value}</Text>;
+const HandValue = ({ cards = [] }) => {
+    const handValue = getHandValue(cards);
+    return <Text sx={{ color: 'white' }}>{cards.length > 0 ? handValue : '-'}</Text>;
+}
 
 export default HandValue;

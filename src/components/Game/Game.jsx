@@ -56,7 +56,7 @@ export const Game = () => {
                     <Text sx={{ color: 'yellow' }}>{`Shoe: ${machine.context.shoe.length} cards`}</Text>
                 </Flex>
             </Flex>
-            <Dealer getHandValue={getHandValue} dealerCards={machine.context.dealerCards} currentState={machine.value} />
+            <Dealer dealerCards={machine?.context?.dealerCards} currentState={machine?.value} />
             <Table />
             <Player
                 currentHandIndex={machine?.context?.currentHandIndex}

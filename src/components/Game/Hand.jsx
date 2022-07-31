@@ -2,6 +2,7 @@ import React from 'react';
 import Box, { Flex } from '../Box';
 import { Text } from '../Text';
 import Card from './Card';
+import HandValue from './HandValue';
 import { getHandValue } from '../../utils/cards';
 
 const Hand = ({
@@ -21,10 +22,8 @@ const Hand = ({
     double,
     split,
 }) => {
-    const value = getHandValue(hand.cards);
-    const isInitial = hand.cards.length === 2 && !hand.isSplit; // todo Validate that this does not count split hands.
+    const isInitial = hand.cards.length === 2 && !hand.isSplit;
     const canSplit = isInitial && hand.cards[0].value === hand.cards[1].value;
-    const isBlackjack = isInitial && value === 21;
     return (
         <Flex sx={{
             mt: '1rem',
@@ -44,7 +43,7 @@ const Hand = ({
                     </React.Fragment>
                 ))}
             </Box>
-            <Text sx={{ color: isBlackjack ? 'yellow' : 'white' }}>{isBlackjack ? 'Blackjack!' : value}</Text>
+            <HandValue cards={hand.cards} />
             <Box sx={{
                 border: 'solid 2px',
                 borderColor: active ? 'yellow' : 'white',
@@ -70,7 +69,20 @@ const Hand = ({
                         alignItems: 'center',
                         gap: '1rem',
                     }}>
-
+                        {hand.status && currentState === 'idle' && (
+                            <Text sx={{
+                                color: 'yellow',
+                                px: 'xxl',
+                                py: 'sm',
+                                border: 'solid 1px yellow',
+                                borderRadius: '0.25rem',
+                                textAlign: 'center',
+                                backgroundColor: '#030',
+                                boxShadow: '0 0 10px #000',
+                            }}>
+                                    {currentState === 'idle' && hand.status}
+                            </Text>
+                        )}
                         <Flex sx={{
                             width: '100%',
                             flexDirection: 'row',

@@ -36,13 +36,13 @@ const isBusted = (cards = []) => getHandValue(cards) > 21;
 const getUpCardValue = (cards = []) => cards?.[1]?.value; // todo Verify that the upcard is the first card dealt to the dealer.
 const isBlackjack = (cards = []) => cards.length === 2 && getHandValue(cards) === 21;
 const getHandValue = (cards = []) => {
-    const sum = cards.reduce((sum, card) => sum + card.value, 0); // Aces are counted as 1.
+    const sum = cards.reduce((sum, card) => sum + card?.value, 0); // Aces are counted as 1.
 
     if (sum > 11) {
         return sum;
     }
 
-    if (cards.filter(card => card.value === 1).length > 0) { // Hand contains >= 1 Ace.
+    if (cards.filter(card => card?.value === 1).length > 0) { // Hand contains >= 1 Ace.
         return sum + 10;
     }
     

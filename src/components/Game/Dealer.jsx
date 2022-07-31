@@ -2,8 +2,9 @@ import  React from 'react';
 import Box, { Flex } from '../Box';
 import Card from './Card';
 import HandValue from './HandValue';
+import { getHandValue, isBlackjack } from '../../utils/cards';
 
-const Dealer = ({ getHandValue, dealerCards, currentState }) => (
+const Dealer = ({ dealerCards, currentState }) => (
     <Flex sx={{
         flexDirection: 'column',
         justifyContent: 'flex-start',
@@ -23,6 +24,7 @@ const Dealer = ({ getHandValue, dealerCards, currentState }) => (
             p: '1rem',
         }}>
             <Flex sx={{
+                position: 'relative',
                 flexDirection: 'row',
                 justifyContent: 'center',
                 gap: '1rem',
@@ -32,12 +34,45 @@ const Dealer = ({ getHandValue, dealerCards, currentState }) => (
                         <Card showBack={index === 0 && currentState !== 'idle'} {...card} />
                     </React.Fragment>
                 ))}
+                {currentState === 'idle' && getHandValue(dealerCards) > 21 && (
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        right: '50%',
+                        transform: 'translate(50%, -50%)',
+                        color: 'yellow',
+                        px: 'xxl',
+                        py: 'sm',
+                        border: 'solid 1px yellow',
+                        borderRadius: '0.25rem',
+                        textAlign: 'center',
+                        backgroundColor: '#030',
+                        boxShadow: '0 0 10px #000',
+                    }}>
+                        BUSTED
+                    </Box>
+                )}
+                {currentState === 'idle' && isBlackjack(dealerCards) && (
+                    <Box sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        right: '50%',
+                        transform: 'translate(50%, -50%)',
+                        color: 'yellow',
+                        px: 'xxl',
+                        py: 'sm',
+                        border: 'solid 1px yellow',
+                        borderRadius: '0.25rem',
+                        textAlign: 'center',
+                        backgroundColor: '#030',
+                        boxShadow: '0 0 10px #000',
+                    }}>
+                        BLACKJACK
+                    </Box>
+                )}
             </Flex>
         </Box>
-        <HandValue value={
-            currentState === 'player' ? // todo This is pretty ugly.
-                dealerCards[1].value === 1 ? '1/11' : dealerCards[1].value :
-                getHandValue(dealerCards || [])} />
+        <HandValue cards={currentState !== 'idle' ? [ dealerCards[1] ] : dealerCards} />
     </Flex>
 );
 

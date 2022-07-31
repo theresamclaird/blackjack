@@ -15,6 +15,7 @@ const newHand = {
     bet: 0,
     cards: [],
     insuranceBet: 0,
+    status: '',
     offerInsurance: false,
     complete: false,
     settled: false,
@@ -283,31 +284,31 @@ createMachine({
 
                 if (isBlackjack(context.dealerCards)) {
                     if (isBlackjack(hand.cards)) {
-                        return { ...hand, settled: true };
+                        return { ...hand, status: 'PUSH', settled: true };
                     }
                     bank += hand.bet;
-                    return { ...hand, bet: 0, settled: true };
+                    return { ...hand, bet: 0, status: 'LOSE', settled: true };
                 }
 
                 if (isBusted(context.dealerCards) && !isBusted(hand.cards)) {
                     const amountWon = hand.bet;
                     bank -= amountWon;
-                    return { ...hand, bet: hand.bet + amountWon, settled: true };
+                    return { ...hand, bet: hand.bet + amountWon, status: 'WIN', settled: true };
                 }
 
                 if (getHandValue(context.dealerCards) === getHandValue(hand.cards)) {
-                    return { ...hand, settled: true };
+                    return { ...hand, status: 'PUSH', settled: true };
                 }
 
                 if (getHandValue(context.dealerCards) > getHandValue(hand.cards)) {
                     bank += hand.bet;
-                    return { ...hand, bet: 0, settled: true };
+                    return { ...hand, bet: 0, status: 'LOSE', settled: true };
                 }
 
                 if (getHandValue(hand.cards) > getHandValue(context.dealerCards)) {
                     const amountWon = hand.bet;
                     bank -= amountWon;
-                    return { ...hand, bet: hand.bet + amountWon, settled: true };
+                    return { ...hand, bet: hand.bet + amountWon, status: 'WIN', settled: true };
                 }
 
                 throw new Error('A hand is in an invalid state.');
@@ -326,6 +327,7 @@ createMachine({
                     bank: context.bank - amountWon,
                     hands: [ ...context.hands ].map((hand, index) => index === handIndex ? {
                         ...hand,
+                        status: 'BLACKJACK',
                         bet: bet + amountWon,
                         complete: true,
                         settled: true,
@@ -347,6 +349,7 @@ createMachine({
                 bank: context.bank + amount,
                 hands: context.hands.map((hand, index) => index === handIndex ? {
                     ...hand,
+                    status: 'SURRENDER',
                     bet: bet - amount,
                     complete: true,
                     settled: true,
@@ -366,6 +369,7 @@ createMachine({
                     bank: context.bank + bet,
                     hands: context.hands.map((hand, index) => index === handIndex ? {
                         ...hand,
+                        status: 'BUST',
                         cards,
                         bet: 0,
                         complete: true,
@@ -414,6 +418,7 @@ createMachine({
                     bankroll,
                     hands: hands.map((hand, index) => index === handIndex ? {
                         ...hand,
+                        status: 'BUST',
                         cards,
                         bet: 0,
                         complete: true,
