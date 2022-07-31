@@ -6,11 +6,13 @@ import mutations from './mutations';
 
 const Hand = ({
     active,
-    handValue,
+    getHandValue,
     removeHand,
     incrementBet,
     decrementBet,
     clearBet,
+    acceptInsuranceBet,
+    declineInsuranceBet,
     stand,
     hit,
     surrender,
@@ -19,19 +21,22 @@ const Hand = ({
     bet,
     cards,
     currentState,
-    numberOfHands,
     settled,
 }) => {
     const disableActionButtons =  !active || currentState === mutations.waitInsurance.label || settled;
     const disableInitialActionButtons = disableActionButtons || cards.length !== 2;
     return (
         <Flex sx={{
-            mt: '3rem',
+            mt: '1rem',
             flexDirection: 'column',
-            justifyContent: 'center',
+            justifyContent: 'flex-start',
             alignItems: 'center',
             gap: '1em',
         }}>
+            <Flex sx={{ justifyContent: 'center', gap: '10rem' }}>
+                <Box onClick={() => acceptInsuranceBet()} as="button">Accept</Box>
+                <Box onClick={() => declineInsuranceBet()} as="button">Decline</Box>
+            </Flex>
             <Box sx={{ position: 'relative', width: '8rem' }}>
                 {cards.map((card, index) => (
                     <React.Fragment key={`player-card-seat-${index}`}>
@@ -39,7 +44,7 @@ const Hand = ({
                     </React.Fragment>
                 ))}
             </Box>
-            {/* <HandValue value={handValue(cards)} /> */}
+            <HandValue value={getHandValue(cards)} />
             <Box sx={{
                 border: 'solid 2px',
                 borderColor: active ? 'yellow' : 'white',
@@ -100,7 +105,7 @@ const Hand = ({
                     <Box disabled={disableActionButtons} onClick={stand} as="button">Stand</Box>
                 </Flex>
                 <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '0.5rem' }}>
-                    <Box disabled={currentState !== mutations.idle.label || numberOfHands < 2} onClick={removeHand} as="button">- Hand</Box>
+                    <Box onClick={removeHand} as="button">- Hand</Box>
                 </Flex>
             </Flex>
         </Flex>

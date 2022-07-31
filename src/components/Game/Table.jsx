@@ -1,31 +1,22 @@
 import React from 'react';
-import Box, { Flex } from '../Box';
+import { Flex } from '../Box';
 import { Text } from '../Text';
-import mutations from './mutations';
 
-const Table = ({
-    placeInsuranceBet,
-    declineInsurance,
-    currentState,
-    hands,
-}) => {
+const Table = () => {
     const commonTextStyle = {
         color: 'yellow',
         textTransform: 'uppercase',
         textAlign: 'center',
         fontWeight: '600',
     };
-
-    const activeHandIndex = hands.findIndex(hand => hand.offerInsurance);
-    const disabled = currentState !== mutations.waitInsurance.label;
-
     return (
         <Flex sx={{ flexDirection: 'column', alignItems: 'center', width: '100%' }}>
             <Text sx={{ ...commonTextStyle, my: 'md' }}>Blackjack pays 3 to 2</Text>
             <Text sx={{ ...commonTextStyle, mb: 'md', color: 'white', }}>Dealer must hit soft 17</Text>
             <Flex sx={{
+                position: 'relative',
                 flexDirection: 'row',
-                justifyContent: 'space-between',
+                justifyContent: 'center',
                 width: '100%',
                 borderStyle: 'solid',
                 borderWidth: '1px',
@@ -35,7 +26,6 @@ const Table = ({
                 py: 'sm',
                 px: 'lg',
             }}>
-                <Box onClick={() => declineInsurance(activeHandIndex)} disabled={disabled} as="button">Decline</Box>
                 <Text sx={{
                     fontFamily: 'fancy',
                     fontWeight: '900',
@@ -43,7 +33,15 @@ const Table = ({
                     ...commonTextStyle,
                     letterSpacing: '0.6rem',
                 }}>Insurance Pays 2 To 1</Text>
-                <Box onClick={() => placeInsuranceBet(activeHandIndex)} disabled={disabled} as="button">Accept</Box>
+                {/* <Flex sx={{
+                    position: 'absolute',
+                    right: '1rem',
+                    flexDirection: 'row',
+                    gap: '1rem',
+                }}>
+                    <Box onClick={() => declineInsurance(activeHandIndex)} as="button">Decline</Box>
+                    <Box onClick={() => placeInsuranceBet(activeHandIndex)} as="button">Accept</Box>
+                </Flex> */}
             </Flex>
         </Flex>
     );

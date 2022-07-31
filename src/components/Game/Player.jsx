@@ -2,24 +2,23 @@ import React from 'react';
 import Box, { Flex } from '../Box';
 import { Text } from '../Text';
 import Hand from './Hand';
-import mutations from './mutations';
+// import mutations from './mutations';
 
 const Player = ({
-    handValue,
+    getHandValue,
     addHand,
     removeHand,
     incrementBet,
     decrementBet,
     clearBet,
     deal,
+    acceptInsuranceBet,
+    declineInsuranceBet,
     stand,
     hit,
     surrender,
     double,
     split,
-    bankroll,
-    hands,
-    currentState,
     machine,
 }) => {
     // const activeHandIndex = machine.playerHands.findLastIndex(hand => !hand.completed);
@@ -31,16 +30,18 @@ const Player = ({
                         <Hand
                             // active={handIndex === activeHandIndex}
                             active={true}
-                            // handValue={handValue}
-                            // removeHand={() => removeHand(handIndex)}
+                            getHandValue={getHandValue}
+                            removeHand={() => removeHand(handIndex)}
                             incrementBet={() => incrementBet(handIndex)}
                             decrementBet={() => decrementBet(handIndex)}
                             clearBet={() => clearBet(handIndex)}
-                            // stand={() => stand(handIndex)}
-                            // hit={() => hit(handIndex)}
-                            // surrender={() => surrender(handIndex)}
-                            // double={() => double(handIndex)}
-                            // split={() => split(handIndex)}
+                            acceptInsuranceBet={() => acceptInsuranceBet(handIndex)}
+                            declineInsuranceBet={() => declineInsuranceBet(handIndex)}
+                            stand={() => stand(handIndex)}
+                            hit={() => hit(handIndex)}
+                            surrender={() => surrender(handIndex)}
+                            double={() => double(handIndex)}
+                            split={() => split(handIndex)}
                             // currentState={currentState}
                             currentState={'idle'}
                             numberOfHands={1}
@@ -50,10 +51,10 @@ const Player = ({
                 ))}
             </Flex>
             <Flex sx={{ flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
-                {/* <Flex sx={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
-                    <Box disabled={currentState !== mutations.idle.label} as="button" onClick={deal}>Deal</Box>
-                    <Box disabled={currentState !== mutations.idle.label} as="button" onClick={addHand}>+ Hand</Box>
-                </Flex> */}
+                <Flex sx={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center', gap: '1rem' }}>
+                    <Box as="button" onClick={deal}>Deal</Box>
+                    <Box as="button" onClick={addHand}>+ Hand</Box>
+                </Flex>
                 <Text sx={{ color: 'yellow' }}>{`Bankroll: ¤ ${machine.context.bankroll}`}</Text>
             </Flex>
         </Flex>

@@ -5,7 +5,7 @@ import {
     isBusted,
     getUpCardValue,
     isBlackjack,
-    handValue,
+    getHandValue,
 } from '../../utils/cards';
 
 /*
@@ -362,7 +362,7 @@ const mutations = {
             if (!state.dealerActionComplete) {
                 const { dealerHitsSoft17 } = configuration;
                 const mustHit = cards => {
-                    const dealerHandValue = handValue(cards);
+                    const dealerHandValue = getHandValue(cards);
                     return dealerHitsSoft17 && isSoft(cards) ? dealerHandValue < 18 : dealerHandValue < 17;
                 };
                 while (mustHit(dealerCards)) { dealerCards.push(shoe.pop()); }
@@ -401,16 +401,16 @@ const mutations = {
                     return { ...hand, bet: hand.bet + amountWon, settled: true };
                 }
 
-                if (handValue(state.dealerCards) === handValue(hand.cards)) {
+                if (getHandValue(state.dealerCards) === getHandValue(hand.cards)) {
                     return { ...hand, settled: true };
                 }
 
-                if (handValue(state.dealerCards) > handValue(hand.cards)) {
+                if (getHandValue(state.dealerCards) > getHandValue(hand.cards)) {
                     bank += hand.bet;
                     return { ...hand, bet: 0, settled: true };
                 }
 
-                if (handValue(hand.cards) > handValue(state.dealerCards)) {
+                if (getHandValue(hand.cards) > getHandValue(state.dealerCards)) {
                     const amountWon = hand.bet;
                     bank -= amountWon;
                     return { ...hand, bet: hand.bet + amountWon, settled: true };
@@ -439,14 +439,7 @@ const mutations = {
 
             const hands = state.hands.map((hand, index) => index === handIndex ? originalHand : hand);
 
-            // const shoe = [ ...state.shoe ];
-            // splitHand.cards.push(shoe.pop());
-
-            // if (handIndex === 0) {
-            //     hands.unshift(splitHand);
-            // } else {
-                hands.splice(handIndex, 0, splitHand);
-            // }
+            hands.splice(handIndex, 0, splitHand);
 
             return {
                 ...state,
