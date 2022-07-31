@@ -21,7 +21,7 @@ const newHand = {
 };
 
 export const blackjackMachine = 
-/** @xstate-layout N4IgpgJg5mDOIC5QCMA2BDAxgawFZewDoBLCVMAYgBEBRAQQBlFQAHAe1mIBdi2A7ZiAAeiALQBGACzjCAZgAMAVgDsk+QE5V62ZIAcAJgA0IAJ5i1iwov3KAbOJULZ1yQF9XxtAXw4SZSgCSAHIAwgBKNACyNEEAKgD6AEI0sYLsnDz8giIIoir6cuqKira66vry4uXGZrmStrKE4rqS+uKyNopSyrKy7p4YOD5EpOTUNOFRMQnJqUgg6dy8AvM5eapWUvq2tvI6iq01YnYFkrLq6rrntkUG-SBeQwR+YyEM9GFJKWkcS1mrYmKp1srWU6nENhaGiOuVs+l0hF0JV0VVkDl0ygO90eeGeEDA6FQFB+GWW2TE+h0hHhNz2EJ0aPUMIk4nkhGk+m0HWuKKU2MGuN8bAAZsKwAAnAJ8WAAV3F6D4mEos3iwQAygBVMJ0UI0El-FagNas0pyeHiEGyOHqSRnZn6RSNdR7BqSZRXZRSaz87zPEViyXSuUKpXjN7BGiqoKa7W6-WZQ3CMSsnpNM7FWw9BrtGFnRFulFqKRSTO2H1PIWiiVS2XyxWUEIAeUiAAV3rE9fNFgnybkwZJqb0draqpS3TC0YQitJFAZ4RpJBny4KiCwwGBsMSu78ewC+wZEdndPYug5nLnnYR3fIUR0pPJ5MoHcvhoQWBgTBQ1bEdVR42S9zHRF2jsXpKV6c4jFMClmkIHZHwfYoykxR8X2ed90E-GMIiCWgwn-f4jUQK1Th6Zx9FtWRdEfJloNyVk2UzfROQXZpbEdMsPAeAVXwwz8AAkAjmVgdwAoiEEkG1CAfL0bHEZRMQU2QYRsAcSiKFxym0eRtjQ3w+OoRsNUSd4CMTHJpDZAxykk9RdmtRcYVZBFmK6OyLV0K4Gj01cPy-NshLM3tOQKKEoQZNzVBUywbRBcpH22DpXJ8t8-KCvcHBkEELVnWLHQ0XQJzUORemKBlNFaRcUvxQkJS3ETSUIpNcmsJodO2S4qJ6JRaNqdjlDg+Q9B0B1rF2RQUtgMAuC4MZ0vExRykRJEFDKNFmOUC82WvW82jUR8+nuPg2HxeB5hxV9RjAebmokeorHY1kzjheRssUZlJMsOwLhaHZtG0N1qoJVAbuNC5ETGuEURBTyczo0Q0W2oadKUC12h0FL-WrIM6yVUGxBaGRbXBK07OYjFmXaApFFe3Z2j2axNH0FK1w3fG+xuKwFLhJTWgXFShsROx7CuZwye9LiLvQj92YkK52VUGn2ih5RH02ui2nUM0WPa900VtIHavFWWSwerohpI16ZwvGRKgxG9zRPPZJum2bru3RrzOTe6SnN56KjemFMVsaT3TaKRele84fJNjQBojjMszRZT4auAdWnpH6zg0Q73CAA */
+/** @xstate-layout N4IgpgJg5mDOIC5QCMA2BDAxgawFZewDoBLCVMAYgBEBRAQQBlFQAHAe1mIBdi2A7ZiAAeiALQBGAJzjCANgBMAFgDM88fLXKAHOK3yANCACeYycpnjd8yZMWStABgDsT+QF83htAXw4SZSgBJADkAYQAlGgBZGmCAFQB9ACEaOMF2Th5+QREECQdHQgBWSVllIuUHcSKHIstDEzzLF0Jamy1FJVknSvdPEG8cXyJScmoaCOjYxJS0pBAM7l4BedzRaQdCcXNxWQcHWS0irWVFBrFmp1aS+w662RVFDy8MIYJ-MdCGenDk1PSOEtsqsxD1Ni5HDcdIoVOJzk1xC02rdFPdHs8Bq88O9RpQ6FQqAkABJ0YJUAGZZY5MTmeSEOySY67JxaVzVeESRF0+THcqORQHbpPfqDbF+XEUSJRADyADUaMTSeT5ossitQGs6spCPJZLtGTynLIijCOc1ubzDkUitYakUMaLhoQIGB0KgKBSgerhKZJPSSkVjZIeXUOhy9kVCE5BVUSrJJLGHVinWwAGapsAAJ0CfFgAFdM+g+Jg8aFQjQAApzViAtXUhDHSPKRmKDrxpytyROM3VP1FDu6WTtpyWWRJnzvNMZ7O5gtFkvjL4hGieusghBKP06e6M5QPHllHvG4rGvUHRTx6zicdvPxTrM5-OF4uUVdU9cX7VSWzacQMxySByLLaqcDhqEOF5VKyN5ikQLBgGA2AeiqtbvhqiAXk2n6qJuHZGrIZoHIQqhaF2DwHCaPJaDBTosBgRhZhQADKcRKm+wLoXkpyyDqsLSM2nTbFoHJXsU0bfta-aOD0NHvHR6AMZmzEAKrhJEZI0OE7Hems5R+gU8YqA4ML7gYxgXD0xRSGo0iojCGhjiKyZyfRjFEoE1YLKhHE+lxyhXPItRWgUurNmZjTrK0VH+WBl57Nssl+PJinUNKylJN82n1qI5SbFoxoHP5-lODc8LiLUrROF2tiKNUrbRk4iVwa5SlMRWDAeVl645Z0rR6rYRoGka4WIBoX6VMG2iMkO8h7k1hDJYxXWcRINQ6gcI7mCaPTWGc5kIHuVzWmYDwlbyNr2k5E5+C6bpLShlI+bkNRXNZ8g9H+zhVcJ+1DiBNVVf2li6MKLzXUQsBgFwXBjMtvmiKyMh1H+Wg6CyP7KPCejgrsSjlCD8jURifBsC68DzI6OIBHDawPDxVQODYhN7tYpEcgN9InNYJVCkOjlg7eRC3agNNiDC9L+e2VTmDoEbs+Luo2DUigdkOI7zfeM5PvOYCiwdjJbFInTDbqpGMuzOiG6yJx6FerjzfBiF6ya2rBkaYHqPsDw-RFdSKFG6OSwoqI6A7LV66IVWEDY0YnMo2iFWYHI2vSf6nNUhMmfH83C1mEfqPpJUqyOnSS-58JlDIVXbCZgb2DC82Q9D5B67H0d2DUlQnCUugV+YUb8QcOjvUGTX5+V-txuUlTVLU9T7RIm6tLVM-5boNpEx4QA */
 createMachine({
   context: {
     bank: 0,
@@ -35,57 +35,111 @@ createMachine({
   states: {
     idle: {
       on: {
-        DEAL: { target: "deal" },
-        INCREMENT_BET: { actions: "incrementBet" },
-        DECREMENT_BET: { actions: "decrementBet" },
-        CLEAR_BET: { actions: "clearBet" },
-        ADD_HAND: { cond: "maxHands", actions: "addHand" },
-        REMOVE_HAND: { cond: "minHands", actions: "removeHand" },
+        DEAL: {
+          target: "deal",
+        },
+        INCREMENT_BET: {
+          actions: "incrementBet",
+        },
+        DECREMENT_BET: {
+          actions: "decrementBet",
+        },
+        CLEAR_BET: {
+          actions: "clearBet",
+        },
+        ADD_HAND: {
+          actions: "addHand",
+          cond: "maxHands",
+        },
+        REMOVE_HAND: {
+          actions: "removeHand",
+          cond: "minHands",
+        },
       },
     },
     deal: {
       entry: "deal",
       always: [
-        { cond: "dealerShowsAce", target: "offerInsurance" },
-        { cond: "dealerShowsTen", target: "peek" },
-        { target: "player" },
+        {
+          cond: "dealerShowsAce",
+          target: "offerInsurance",
+        },
+        {
+          cond: "dealerShowsTen",
+          target: "peek",
+        },
+        {
+          target: "player",
+        },
       ],
     },
     offerInsurance: {
       entry: "offerInsurance",
-      on: {
-        ACCEPT: { actions: "acceptInsuranceBet" },
-        DECLINE: { actions: "declineInsuranceBet" },
+      always: {
+        cond: "allHandsResponded",
+        target: "peek",
       },
-      always: [{ cond: "allHandsResponded", target: "peek" }],
+      on: {
+        ACCEPT: {
+          actions: "acceptInsuranceBet",
+        },
+        DECLINE: {
+          actions: "declineInsuranceBet",
+        },
+      },
     },
     peek: {
       always: [
-        { cond: "dealerHasBlackjack", target: "settle" },
-        { target: "player" },
+        {
+          cond: "dealerHasBlackjack",
+          target: "settle",
+        },
+        {
+          target: "player",
+        },
       ],
     },
     player: {
       entry: "initializeHands",
-      on: {
-        STAND: { actions: "standHand" },
-        SURRENDER: { actions: "surrenderHand" },
-        HIT: { actions: "hitHand" },
-        DOUBLE: { actions: "doubleHand" },
-        SPLIT: { actions: "splitHand" },
-      },
       always: [
-        { cond: "allHandsSettled", target: "idle" },
-        { cond: "allHandsComplete", target: "dealer" },
+        {
+          cond: "allHandsSettled",
+          target: "idle",
+        },
+        {
+          cond: "allHandsComplete",
+          target: "dealer",
+        },
       ],
+      on: {
+        STAND: {
+          actions: "standHand",
+        },
+        SURRENDER: {
+          actions: "surrenderHand",
+        },
+        HIT: {
+          actions: "hitHand",
+        },
+        DOUBLE: {
+          actions: "doubleHand",
+        },
+        SPLIT: {
+          actions: "splitHand",
+        },
+      },
     },
     dealer: {
       entry: "playDealerHand",
-      always: [{ target: "settle" }],
+      always: {
+        target: "settle",
+      },
     },
     settle: {
       entry: "settleBets",
-      always: [{ target: "idle" }],
+      always: {
+        target: "idle",
+      },
     },
   },
 },

@@ -2,7 +2,6 @@ import React from 'react';
 import Box, { Flex } from '../Box';
 import { Text } from '../Text';
 import Hand from './Hand';
-// import mutations from './mutations';
 
 const Player = ({
     getHandValue,

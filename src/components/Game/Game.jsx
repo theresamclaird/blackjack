@@ -38,50 +38,47 @@ export const Game = () => {
     }
 
     return (
-        <>
-            <Flex sx={{
-                width: '100vw',
-                height: '100vh',
-                bg: 'feltGreen',
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                alignItems: 'center',
-            }}>
-                <Flex sx={{ justifyContent: 'space-between', alignItems: 'flex-start', p: '1rem', width: '100%' }}>
-                    <Text sx={{ textShadow: '0 0 10px #333', cursor: 'pointer', color: 'white' }} onClick={() => setShowConfiguration(!showConfiguration)}>⚙️</Text>
-                    <Flex sx={{ flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-end', gap: '1rem' }}>
-                    <Text sx={{ color: 'yellow' }}>{`Bank: ¤ ${machine.context.bank}`}</Text>
-                        <Text sx={{ color: 'yellow' }}>{`Shoe: ${machine.context.shoe.length} cards`}</Text>
-                    </Flex>
+        <Flex sx={{
+            width: '100vw',
+            height: '100vh',
+            bg: 'feltGreen',
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            alignItems: 'center',
+        }}>
+            <Flex sx={{ justifyContent: 'space-between', alignItems: 'flex-start', p: '1rem', width: '100%' }}>
+                <Text sx={{ textShadow: '0 0 10px #333', cursor: 'pointer', color: 'white' }} onClick={() => setShowConfiguration(!showConfiguration)}>⚙️</Text>
+                <Flex sx={{ flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-end', gap: '1rem' }}>
+                <Text sx={{ color: 'yellow' }}>{`Bank: ¤ ${machine.context.bank}`}</Text>
+                    <Text sx={{ color: 'yellow' }}>{`Shoe: ${machine.context.shoe.length} cards`}</Text>
                 </Flex>
-                <Dealer getHandValue={getHandValue} dealerCards={machine.context.dealerCards} currentState={machine.value} />
-                <Table />
-                <Player
-                    getHandValue={getHandValue}
-                    currentState={machine.value}
-                    deal={() => send({ type: 'DEAL', payload: { configuration } })}
-                    addHand={() => send({ type: 'ADD_HAND' })}
-                    removeHand={handIndex => send({ type: 'REMOVE_HAND', payload: { handIndex } })}
-                    incrementBet={handIndex => send({ type: 'INCREMENT_BET', payload: { handIndex, configuration } })}
-                    decrementBet={handIndex => send({ type: 'DECREMENT_BET', payload: { handIndex, configuration } })}
-                    clearBet={handIndex => send({ type: 'CLEAR_BET', payload: { handIndex, configuration } })}
-                    acceptInsuranceBet={handIndex => send({ type: 'ACCEPT', payload: { handIndex, configuration } })}
-                    declineInsuranceBet={handIndex => send({ type: 'DECLINE', payload: { handIndex, configuration } })}
-                    stand={handIndex => send({ type: 'STAND', payload: { handIndex } })}
-                    hit={handIndex => send({ type: 'HIT', payload: { handIndex } })}
-                    surrender={handIndex => send({ type:'SURRENDER', payload: { handIndex, configuration } })}
-                    double={handIndex => send({ type: 'DOUBLE', payload: { handIndex } })}
-                    split={handIndex => send({ type: 'SPLIT', payload: { handIndex } })}
-                    machine={machine}
-                />
             </Flex>
-            {showConfiguration && (
-                <Configuration
-                    configuration={configuration}
-                    toggle={() => setShowConfiguration(!showConfiguration)}
-                    setConfiguration={setConfiguration}
-                />
-            )}
-        </>
+            <Dealer getHandValue={getHandValue} dealerCards={machine.context.dealerCards} currentState={machine.value} />
+            <Table />
+            <Player
+                getHandValue={getHandValue}
+                currentState={machine.value}
+                deal={() => send({ type: 'DEAL', payload: { configuration } })}
+                addHand={() => send({ type: 'ADD_HAND' })}
+                removeHand={handIndex => send({ type: 'REMOVE_HAND', payload: { handIndex } })}
+                incrementBet={handIndex => send({ type: 'INCREMENT_BET', payload: { handIndex, configuration } })}
+                decrementBet={handIndex => send({ type: 'DECREMENT_BET', payload: { handIndex, configuration } })}
+                clearBet={handIndex => send({ type: 'CLEAR_BET', payload: { handIndex, configuration } })}
+                acceptInsuranceBet={handIndex => send({ type: 'ACCEPT', payload: { handIndex, configuration } })}
+                declineInsuranceBet={handIndex => send({ type: 'DECLINE', payload: { handIndex, configuration } })}
+                stand={handIndex => send({ type: 'STAND', payload: { handIndex } })}
+                hit={handIndex => send({ type: 'HIT', payload: { handIndex } })}
+                surrender={handIndex => send({ type:'SURRENDER', payload: { handIndex, configuration } })}
+                double={handIndex => send({ type: 'DOUBLE', payload: { handIndex } })}
+                split={handIndex => send({ type: 'SPLIT', payload: { handIndex } })}
+                machine={machine}
+            />
+            <Configuration
+                show={showConfiguration}
+                configuration={configuration}
+                hide={() => setShowConfiguration(false)}
+                setConfiguration={setConfiguration}
+            />
+        </Flex>
     );
 };
