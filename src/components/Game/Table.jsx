@@ -14,7 +14,6 @@ const Table = () => {
             <Text sx={{ ...commonTextStyle, my: 'md' }}>Blackjack pays 3 to 2</Text>
             <Text sx={{ ...commonTextStyle, mb: 'md', color: 'white', }}>Dealer must hit soft 17</Text>
             <Flex sx={{
-                position: 'relative',
                 flexDirection: 'row',
                 justifyContent: 'center',
                 width: '100%',
@@ -33,15 +32,6 @@ const Table = () => {
                     ...commonTextStyle,
                     letterSpacing: '0.6rem',
                 }}>Insurance Pays 2 To 1</Text>
-                {/* <Flex sx={{
-                    position: 'absolute',
-                    right: '1rem',
-                    flexDirection: 'row',
-                    gap: '1rem',
-                }}>
-                    <Box onClick={() => declineInsurance(activeHandIndex)} as="button">Decline</Box>
-                    <Box onClick={() => placeInsuranceBet(activeHandIndex)} as="button">Accept</Box>
-                </Flex> */}
             </Flex>
         </Flex>
     );

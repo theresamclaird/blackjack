@@ -1,5 +1,6 @@
 import  React from 'react';
 import Box, { Flex } from '../Box';
+import { Text } from '../Text';
 import Card from './Card';
 import HandValue from './HandValue';
 import { getHandValue, isBlackjack } from '../../utils/cards';
@@ -35,7 +36,7 @@ const Dealer = ({ dealerCards, currentState }) => (
                     </React.Fragment>
                 ))}
                 {currentState === 'idle' && getHandValue(dealerCards) > 21 && (
-                    <Box sx={{
+                    <Text sx={{
                         position: 'absolute',
                         top: '50%',
                         right: '50%',
@@ -50,10 +51,10 @@ const Dealer = ({ dealerCards, currentState }) => (
                         boxShadow: '0 0 10px #000',
                     }}>
                         BUSTED
-                    </Box>
+                    </Text>
                 )}
                 {currentState === 'idle' && isBlackjack(dealerCards) && (
-                    <Box sx={{
+                    <Text sx={{
                         position: 'absolute',
                         top: '50%',
                         right: '50%',
@@ -68,7 +69,7 @@ const Dealer = ({ dealerCards, currentState }) => (
                         boxShadow: '0 0 10px #000',
                     }}>
                         BLACKJACK
-                    </Box>
+                    </Text>
                 )}
             </Flex>
         </Box>

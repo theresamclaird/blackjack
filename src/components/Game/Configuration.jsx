@@ -13,19 +13,26 @@ const Configuration = ({ configuration, setConfiguration, hide, show = false }) 
         }}>
             <Box sx={{
                 backgroundColor: 'feltGreen',
-                border: 'solid 2px',
+                border: 'solid 1px',
                 borderColor: 'darkGreen',
-                borderRadius: '0.5rem',
+                borderRadius: '0.25rem',
                 color: 'white',
                 boxShadow: '2px 2px 20px #333',
                 p: 'md',
             }}>
-                <Flex sx={{ flexDirection: 'row', justifyContent: 'space-between', px: '0.4rem', pt: '0.4rem' }}>
+                <Flex sx={{ flexDirection: 'row', justifyContent: 'space-between', py: '0.1rem', mb: '0.5rem' }}>
                     <Text>Configuration</Text>
                     <Text sx={{ fontSize: '0.66rem', cursor: 'pointer' }} onClick={hide}>❌</Text>
                 </Flex>
 
-                <Box as="form" sx={{ p: 'xl' }}>
+                <Box
+                    as="form"
+                    sx={{
+                        p: 'lg',
+                        border: 'solid 1px #000',
+                        boxShadow: 'inset 0 0 10rem #030',
+                    }}
+                >
                     <Flex as="fieldset" sx={{ flexDirection: 'column', gap: '1rem', minWidth: '15rem' }}>
 
                         <Flex as="label" sx={{ flexDirection: 'row', justifyContent: 'space-between', gap: '2rem' }}>
@@ -109,6 +116,22 @@ const Configuration = ({ configuration, setConfiguration, hide, show = false }) 
                                     doubleAfterSplit: e.target.checked,
                                 })}
                             />
+                        </Flex>
+
+                        <Flex as="label" sx={{ justifyContent: 'space-between' }}>
+                                <Text>Double on:</Text>
+                                <Box
+                                    as="select"
+                                    name="double"
+                                    value={configuration.surrender}
+                                    onChange={e => setConfiguration({
+                                        ...configuration,
+                                    })}
+                                >
+                                    <Box as="option" value="late">Any</Box>
+                                    <Box as="option" value="early">10,11</Box>
+                                    <Box as="option" value="false">9,10,11</Box>
+                                </Box>
                         </Flex>
 
                         <Flex as="label" sx={{ flexDirection: 'row', justifyContent: 'space-between' }}>
