@@ -24,6 +24,23 @@ const Hand = ({
 }) => {
     const isInitial = hand.cards.length === 2 && !hand.isSplit;
     const canSplit = isInitial && hand.cards[0].value === hand.cards[1].value;
+
+    const BetButtonStyle = {
+        color: 'white',
+        fontWeight: '900',
+        fontSize: '1rem',
+        backgroundColor: 'darkGreen',
+        p: 'sm',
+        px: 'md',
+        borderTop: 'solid 1px #060',
+        borderLeft: 'solid 1px #060',
+        borderRight: 'solid 1px #030',
+        borderBottom: 'solid 1px #030',
+        cursor: 'pointer',
+        boxShadow: '0 0 10px #000',
+        borderRadius: '1rem',
+    };
+
     return (
         <Flex sx={{
             mt: '1rem',
@@ -90,9 +107,9 @@ const Hand = ({
                             alignItems: 'center',
                         }}>
                             <Box
-                                sx={{ backgroundColor: 'transparent', border: 0, cursor: 'pointer' }}
+                                sx={BetButtonStyle}
                                 disabled={currentState !== 'idle'}
-                                onClick={decrementBet} as="button">➖</Box>
+                                onClick={decrementBet} as="button">-</Box>
                             <Box
                                 sx={{
                                     fontFamily: 'default',
@@ -102,9 +119,9 @@ const Hand = ({
                                     mx: 'sm',
                                 }}>{`¤ ${hand.bet}`}</Box>
                             <Box
-                                sx={{ backgroundColor: 'transparent', border: 0, cursor: 'pointer' }}
+                                sx={BetButtonStyle}
                                 disabled={currentState !== 'idle'}
-                                onClick={incrementBet} as="button">➕</Box>
+                                onClick={incrementBet} as="button">+</Box>
                         </Flex>
 
                         <Box
