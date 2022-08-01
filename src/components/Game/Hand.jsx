@@ -89,7 +89,10 @@ const Hand = ({
                             justifyContent: 'space-between',
                             alignItems: 'center',
                         }}>
-                            <Box disabled={currentState !== 'idle'} onClick={decrementBet} as="button">-</Box>
+                            <Box
+                                sx={{ backgroundColor: 'transparent', border: 0, cursor: 'pointer' }}
+                                disabled={currentState !== 'idle'}
+                                onClick={decrementBet} as="button">➖</Box>
                             <Box
                                 sx={{
                                     fontFamily: 'default',
@@ -98,10 +101,17 @@ const Hand = ({
                                     fontWeight: '900',
                                     mx: 'sm',
                                 }}>{`¤ ${hand.bet}`}</Box>
-                            <Box disabled={currentState !== 'idle'} onClick={incrementBet} as="button">+</Box>
+                            <Box
+                                sx={{ backgroundColor: 'transparent', border: 0, cursor: 'pointer' }}
+                                disabled={currentState !== 'idle'}
+                                onClick={incrementBet} as="button">➕</Box>
                         </Flex>
 
-                        <Box disabled={currentState !== 'idle'} as="button" onClick={clearBet}>Clear</Box>
+                        <Box
+                            sx={{ cursor: 'pointer' }}
+                            disabled={currentState !== 'idle'}
+                            as="button"
+                            onClick={clearBet}>Retrieve</Box>
 
                     </Flex>
                 </Flex>
