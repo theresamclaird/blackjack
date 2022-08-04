@@ -20,17 +20,17 @@ import { getHandValue } from '../../utils/cards';
         - Add variants to Button and use it for the other buttons.
 */
 
-const surrenderOptions = {
-    late: 'late',
-    early: 'early',
-    false: 'false,'
-};
+// const surrenderOptions = {
+//     late: 'late',
+//     early: 'early',
+//     false: 'false,'
+// };
 
-const doubleOptions = {
-    any: 'any',
-    tenEleven: 'tenEleven',
-    nineTenEleven: 'nineTenEleven',
-};
+// const doubleOptions = {
+//     any: 'any',
+//     tenEleven: 'tenEleven',
+//     nineTenEleven: 'nineTenEleven',
+// };
 
 export const Game = () => {
     const [configuration, setConfiguration] = useState(() => ({
