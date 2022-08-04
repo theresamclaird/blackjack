@@ -1,23 +1,27 @@
-import styled from '@emotion/styled';
-import { variant } from 'styled-system'
+import React from 'react';
+import { Box } from '../Box';
 
-const Button = styled('button')(
-  {
-    appearance: 'none',
-    fontFamily: 'inherit',
-    cursor: 'pointer',
-  },
-  variant({
-    variants: {
-      primary: {
-        fontSize: '2rem',
-        backgroundColor: 'feltGreen',
-        border: 0,
-        color: 'white',
-        p: 'sm',
-    },
-    }
-  })
+// todo add Variants.
+
+const Button = ({ sx, children, ...props }) => (
+  <Box
+    sx={{
+      fontFamily: 'Courier',
+      color: 'white',
+      fontWeight: '900',
+      fontSize: '1.5rem',
+      backgroundColor: 'transparent',
+      border: 0,
+      p: 'sm',
+      m: 0,
+      cursor: 'pointer',
+      ...sx,
+    }}
+    as="button"
+    {...props}
+  >
+    {children}
+  </Box>
 );
 
 export default Button;

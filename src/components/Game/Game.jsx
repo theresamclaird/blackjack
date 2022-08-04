@@ -2,22 +2,35 @@ import React, { useState } from 'react';
 import { useMachine } from '@xstate/react';
 import { Flex } from '../Box';
 import { Text } from '../Text';
-import Player from './Player';
-import Hand from './Hand';
-import Table from './Table';
-import Dealer from './Dealer';
-import Configuration from './Configuration';
-import { blackjackMachine } from './machine';
+import Player from '../Player';
+import Hand from '../Hand';
+import Table from '../Table';
+import Dealer from '../Dealer';
+import ConfigurationPanel from '../ConfigurationPanel';
+import blackjackMachine from '../../state/blackjackMachine';
 import { getHandValue } from '../../utils/cards';
 
 /*
     todo:
         - Find a better place/way? to render the "Accept" and "Decline" buttons for insurance.
         - Add unit tests.
-        - Add "double" array to configuration panel.
-        - Fix accounting bug.
+        - Hook up configuration to game logic.
+        - Fix accounting bug?
         - Allow the player to scroll horizontally to see all hands.
+        - Add variants to Button and use it for the other buttons.
 */
+
+const surrenderOptions = {
+    late: 'late',
+    early: 'early',
+    false: 'false,'
+};
+
+const doubleOptions = {
+    any: 'any',
+    tenEleven: 'tenEleven',
+    nineTenEleven: 'nineTenEleven',
+};
 
 export const Game = () => {
     const [configuration, setConfiguration] = useState(() => ({
@@ -29,7 +42,7 @@ export const Game = () => {
         doubleAfterSplit: true,
         surrender: 'late', // Can be false, 'early', or 'late'.
         blackjackPays: 3 / 2,
-        double: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+        double: 'any', // Can be 'any', 'TenEleven', or 'NineTenEleven'.
     }));
     const [showConfiguration, setShowConfiguration] = useState(false);
     const [machine, send] = useMachine(blackjackMachine);
@@ -85,7 +98,7 @@ export const Game = () => {
                     />
                 )}
             />
-            <Configuration
+            <ConfigurationPanel
                 show={showConfiguration}
                 configuration={configuration}
                 hide={() => setShowConfiguration(false)}

@@ -1,8 +1,8 @@
 import  React from 'react';
 import Box, { Flex } from '../Box';
 import { Text } from '../Text';
-import Card from './Card';
-import HandValue from './HandValue';
+import Card from '../Card';
+import { HandValue } from '../Hand';
 import { getHandValue, isBlackjack } from '../../utils/cards';
 
 const Dealer = ({ dealerCards, currentState }) => (

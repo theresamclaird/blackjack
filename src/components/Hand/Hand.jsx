@@ -1,9 +1,9 @@
 import React from 'react';
 import Box, { Flex } from '../Box';
 import { Text } from '../Text';
-import Card from './Card';
-import HandValue from './HandValue';
-import { getHandValue } from '../../utils/cards';
+import Card from '../Card';
+import { Button } from '../Button';
+import { HandValue } from '.';
 
 const Hand = ({
     canRemoveHand,
@@ -24,22 +24,6 @@ const Hand = ({
 }) => {
     const isInitial = hand.cards.length === 2 && !hand.isSplit;
     const canSplit = isInitial && hand.cards[0].value === hand.cards[1].value;
-
-    const BetButtonStyle = {
-        color: 'white',
-        fontWeight: '900',
-        fontSize: '1rem',
-        backgroundColor: 'darkGreen',
-        p: 'sm',
-        px: 'md',
-        borderTop: 'solid 1px #060',
-        borderLeft: 'solid 1px #060',
-        borderRight: 'solid 1px #030',
-        borderBottom: 'solid 1px #030',
-        cursor: 'pointer',
-        boxShadow: '0 0 10px #000',
-        borderRadius: '1rem',
-    };
 
     return (
         <Flex sx={{
@@ -79,7 +63,7 @@ const Hand = ({
                     p: '1rem',
                 }}>
                     <Flex sx={{
-                        height: '75%', // todo Rework this so that the +/- line is vertically centered within the bet circle.
+                        height: '90%', // todo Rework this so that the +/- line is vertically centered within the bet circle.
                         width: '100%',
                         flexDirection: 'column',
                         justifyContent: 'flex-end',
@@ -106,10 +90,14 @@ const Hand = ({
                             justifyContent: 'space-between',
                             alignItems: 'center',
                         }}>
-                            <Box
-                                sx={BetButtonStyle}
+                            <Button
+                                sx={{
+                                    ':disabled': {
+                                        color: '#ccc',
+                                    },
+                                }}
                                 disabled={currentState !== 'idle'}
-                                onClick={decrementBet} as="button">-</Box>
+                                onClick={decrementBet} as="button">—</Button>
                             <Box
                                 sx={{
                                     fontFamily: 'default',
@@ -118,10 +106,14 @@ const Hand = ({
                                     fontWeight: '900',
                                     mx: 'sm',
                                 }}>{`¤ ${hand.bet}`}</Box>
-                            <Box
-                                sx={BetButtonStyle}
+                            <Button
+                                sx={{
+                                    ':disabled': {
+                                        color: '#ccc',
+                                    },
+                                }}
                                 disabled={currentState !== 'idle'}
-                                onClick={incrementBet} as="button">+</Box>
+                                onClick={incrementBet} as="button">+</Button>
                         </Flex>
 
                         <Box

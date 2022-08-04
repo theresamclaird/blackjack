@@ -7,4 +7,4 @@ const Pip = ({ sx, pip }) => (
     </Flex>
 );
 
-export { Pip, Pip as default };
+export default Pip;

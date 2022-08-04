@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Flex } from '../Box';
 import { Text } from '../Text';
 
-const Configuration = ({ configuration, setConfiguration, hide, show = false }) => show && (
+const ConfigurationPanel = ({ configuration, setConfiguration, hide, show = false }) => show && (
     <>
         <Box onClick={hide} sx={{ position: 'absolute', width: '100vw', height: '100vh', backgroundColor: '#333', opacity: '0.66' }} />
         <Box sx={{
@@ -172,4 +172,4 @@ const Configuration = ({ configuration, setConfiguration, hide, show = false }) 
     </>
 );
 
-export default Configuration;
+export default ConfigurationPanel;

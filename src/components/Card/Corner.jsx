@@ -21,4 +21,4 @@ const Corner = ({ sx, rank, pip }) => {
     );
 };
 
-export { Corner, Corner as default };
+export default Corner;

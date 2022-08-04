@@ -8,8 +8,8 @@ import {
     isBusted,
     shuffle,
     cut,
- } from '../../utils/cards';
-import { getRandomNumberInRange } from '../../utils/random';
+ } from '../utils/cards';
+import { getRandomNumberInRange } from '../utils/random';
 
 const newHand = {
     bet: 0,
@@ -21,8 +21,8 @@ const newHand = {
     settled: false,
 };
 
-export const blackjackMachine = 
-/** @xstate-layout N4IgpgJg5mDOIC5QCMA2BDAxgawFZewDoBLCVMAYgBEBRAQQBlFQAHAe1mIBdi2A7ZiAAeiALQBGAOyTCATgDMsqQBZx4gBwKADACZ5AGhABPMZpmSArBfmTZW8dZ2SAvs8NoC+HCTKUAkgByAMIASjQAsjQBACoA+gBCNNGC7Jw8-IIiCBJaAGy5cmo6WhZKOqWyuYYm2WrK8oS5spJ5NrmK6q7uGDheRKTk1DShEVFxiclIIKncvAJTWaKaBcrKufY6lbni8hrVYnUNTS25trnqmvI6XSAevQQ+g0EM9CEJSSkcsxkLYpJShC0sk24h06kkmiUFn2tXE9UazTyZwuCmubluPTwDwGlDoVCosQAEnQAlRPmk5pkxJt1IR1HD6soLJJcjomrIYRIdrTNBZ6pZmUp-jc7ljvDiKGFwgB5ABqNCJJLJUxm6XmoEWylkskIzNyfPpVmKYIMxgO3Lpsj5ynUWhaxV0IsxfUIEDA6FQFHJ33VwlMFkI0lWGnUejy53EnOZOkI8nqEbqDlBTs8DzYADN02AAE5+PiwACu2fQfEwuKCQRoAAVJqwvmqqQgKoDbe0pNrZKpTTUuWzCDoivkB1rtsoU-dvBms7n80WS2Whs9AjRvQ3fgg2Q0LFotLt8vILtIdJy1Fd+7omvZcqoIbJx2KiFOc3nC8XS5RV5T18oWXT1Ez1AscodHqcplE5SQtTkI9KnEdo2X-e8XRYMAwGwL0VXrL8NUQH8dV3OFbHkIDxG1bs-hjLYSlKPRbD0cQkIeFgMCMHMKAAZWiJVPx+HDsnkM8rFtVYQRZHRjzNbJylpYpJCcOxJHkXctDWRjvGY9BWOzDiAFUQjCUkaBCHjfUWOMA2UexbFKZQBzsdoT0swgHFZWR1CHJo0W6VN1JYtjCT8Wtpiw3i-X4vRdWKaxbFtDQWRhEDYxsLR1HMixQ1sixcjUogNK06hpR0+IXhMxtRAEmR2yUfdrBS8iEAtET-htNzaLjHLCDytj2KrBhAtK9dyrBWMWVtEpgQyqpJPKFYFH-fl-1BdoOq67SBr4iR5AKEisvWICwR2cDJMsrQ5HEsEgIPdKrA6t0PTY9awqA07wUg41QN2I6aiaApLEgncSgPc4XHRUUXVgMAuC4QZHsWQCZFDdpVDta9qphQDlEBWw4JOtQITRdE+DYN14CmMHsV8WGxHg2NpKZRSDx-CSeyUTHQV3aQUp-OD5Fu91UCp-jTssMDtXEO0lPsTklFOhTdA7Ui4M6UHnTTTNn1nN8y0FyyeRU5kmYsOEHGln9AyE9o4yvJoVtQ7BBasGRticLVzqN69ORtcRCFUdYpHbFoIWylWfNyvzs0F0R8ljNQFFZYjnbjE98KN2zxaZH68j5+6I8wilQsWNQA0UXdJcUYEf3UGF8gDBxbP1HZmjjEHvInIgIah8hBbkmMkf1ex3JU4jq-1Zy+XEuSrXdryMVDyPxbsQp2dKUEKimntQQcRp8fS8W2Wx1xXCAA */
+const blackjackMachine = 
+/** @xstate-layout N4IgpgJg5mDOIC5QCMA2BDAxgawFZewDoBLCVMAYgBEBRAQQBlFQAHAe1mIBdi2A7ZiAAeiALQBGAOyTCATgDMsqQBZx4gBwKADACZ5AGhABPMZpmSArBfmTZW8dZ2SAvs8NoC+HCTKUAkgByAMIASjQAsjQBACoA+gBCNNGC7Jw8-IIiCBJaAGy5cmo6WhZKOqWyuYYm2WrK8oS5spJ5NrmK6q7uGDheRKTk1DShEVFxiclIIKncvAJTWaKaBcrKufY6lbni8hrVYnUNTS25trnqmvI6XSAevQQ+g0EM9CEJSSkcsxkLYpJShC0sk24h06kkmiUFn2tXE9UazTyZwuCmubluPTwDwGlDoVCosQAEnQAlRPmk5pkxJt1IR1HD6soLJJcjomrIYRIdrTNBZ6pZmUp-jc7ljvDiKGFwgB5ABqNCJJLJUxm6XmoEWylkskIzNyfPpVmKYIMxgO3Lpsj5ynUWhaxV0IsxfUIEDA6FQFHJ33VwlMFkI0lWGnUejy53EnOZOkI8nqEbqDlBTs8DzYADN02AAE5+PiwACu2fQfEwuKCQRoAAVJqwvmqqQgKoDbe0pNrZKpTTUuWzCDoivkB1rtsoU-dvBms7n80WS2Whs9AjRvQ3fgg2Q0LFotLt8vILtIdJy1Fd+7omvZcqoIbJx2KiFOc3nC8XS5RV5T18oWXT1Ez1AscodHqcplE5SQtTkI9KnEdo2X-e8XRYMAwGwL0VXrL8NUQH8dV3OFbHkIDxG1bs-hjLYSlKPRbD0cQkIeFgMCMHMKAAZWiJVPx+HDsnkM8rFtVYQRZHRjzNbJylpYpJCcOxJHkXctDWRjvGY9BWOzDiAFUQjCUkaBCHjfUWOMA2UexbFKZQBzsdoT0swgHFZWR1CHJo0W6VN1JYtjCT8Wtpiw3i-X4vRdWKaxbFtDQWRhEDYxsLR1HMixQ1sixcjUogNK06hpR0+IXhMxtRAEmR2yUfdrBS8iEAtET-htNzaLjHLCDytj2KrBhAtK9dyrBWMWVtEpgQyqpJPKFYFH-fl-1BdoOq67SBr4iR5AKEisvWICwR2cDJMsrQ5HEsEgIPdKrA6t0PTY9awqA07wUg41QN2I6aiaApLEgncSgPc4XHRUUXVgMAuC4QZHsWQCZFDdpVDta9qphQDlEBWw4JOtQITRdE+DYN14CmMHsV8WGxHg2NpKZRSDx-CSeyUTHQV3aQUp-OD5Fu91UCp-jTssMDtXEO0lPsTklFOhTdA7Ui4M6UHnTTTNn1nN8y0FyyeRU5kmYsOEHGln9AyE9o4yvJoVtQ7BBasGRticLVzqN69ORtcRCFUdYpHbFoIWylWfNyvzs0F0R8ljNQFFZYjnbjE98KN2zxaZH68j5+6I8wilQsWNQA0UXdJcUYEf3UGF8gDBxbP1HZmjjEHvInIgIah8hBbkmMkf1ex3JU4jq-1Zy+XEuSrXdryMVDyPxbsQp2dKUEKimntQQcBEWh2PltAsVxXCAA */
 createMachine({
   context: {
     bank: 0,
@@ -114,8 +114,8 @@ createMachine({
           target: "dealer",
         },
         {
+          actions: "addCardToHand",
           cond: "handNeedsSecondCard",
-          actions: "addCardToHand"
         },
       ],
       on: {
@@ -400,6 +400,8 @@ createMachine({
             const betAmount = context.hands[handIndex].bet;
             const bankroll = context.bankroll - betAmount;
 
+            console.log('doubleHand', { betAmount, bankroll });
+
             const hands = context.hands.map((hand, index) => index === handIndex ? {
                 ...hand,
                 bet: hand.bet + betAmount,
@@ -457,3 +459,5 @@ createMachine({
         }),
     },
 });
+
+export default blackjackMachine;
