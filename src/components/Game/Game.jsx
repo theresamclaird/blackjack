@@ -12,12 +12,10 @@ import { getHandValue } from '../../utils/cards';
 /*
     todo:
         - bug: split aces and get a ten and it will be counted as a blackjack.
-        - Find a better place/way? to render the "Accept" and "Decline" buttons for insurance.
         - Add unit tests.
         - Hook up configuration to game logic.
         - Fix accounting bug?
         - Allow the player to scroll horizontally to see all hands.
-        - Add variants to Button and use it for the other buttons.
 */
 
 // const surrenderOptions = {
