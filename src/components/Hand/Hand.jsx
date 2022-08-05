@@ -44,7 +44,7 @@ const Bet = ({ amount, sx }) => (
             width: '4rem',
             color: 'white',
             backgroundColor: amount === 0 ? '#999' : 'red',
-            outline: 'inset 5px',
+            outline: 'outset 5px',
             outlineOffset: '-8px',
             outlineColor: '#ccc',
             border: 'solid 1px',
@@ -151,7 +151,7 @@ const Hand = ({
                         disabled={hand.bet === 0 || currentState !== 'idle'}
                         onClick={clearBet}>Retrieve</Button>
                 </Flex>
-                <Text sx={{
+                {handValue > 0 && <Text sx={{
                     fontSize: '0.66rem',
                     color: 'white',
                     position: 'absolute',
@@ -159,7 +159,7 @@ const Hand = ({
                     top: '4rem',
                     width: '1.7rem',
                     textAlign: 'right',
-                }}>{isSoft(hand.cards) ? `${handValue - 10}/${handValue}` : handValue}</Text>
+                }}>{isSoft(hand.cards) ? `${handValue - 10}/${handValue}` : handValue}</Text>}
                 {hand.status && hand.settled && <Banner message={hand.status} sx={{ top: '17%', width: '120%' }} />}
             </Box>
             <Flex sx={{ justifyContent: 'center', gap: '1rem' }}>
