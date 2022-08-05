@@ -107,7 +107,7 @@ const ConfigurationPanel = ({ configuration, setConfiguration, hide, show = fals
                         </Flex>
 
                         <Flex as="label" sx={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-                            <Text>Double after split allowed:</Text>
+                            <Text>Double after split:</Text>
                             <Box
                                 as="input"
                                 type="checkbox"
