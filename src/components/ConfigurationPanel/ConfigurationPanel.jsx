@@ -1,11 +1,12 @@
 import React from 'react';
 import { Box, Flex } from '../Box';
-import { Text } from '../Text';
+import Text from '../Text';
 
 const ConfigurationPanel = ({ configuration, setConfiguration, hide, show = false }) => show && (
     <>
-        <Box onClick={hide} sx={{ position: 'absolute', width: '100vw', height: '100vh', backgroundColor: '#333', opacity: '0.66' }} />
+        <Box onClick={hide} sx={{ zIndex: '100', position: 'absolute', width: '100vw', height: '100vh', backgroundColor: '#333', opacity: '0.66' }} />
         <Box sx={{
+            zIndex: '200',
             position: 'absolute',
             top: '10%',
             left: '50%',
@@ -126,11 +127,12 @@ const ConfigurationPanel = ({ configuration, setConfiguration, hide, show = fals
                                     value={configuration.surrender}
                                     onChange={e => setConfiguration({
                                         ...configuration,
+                                        double: e.target.value,
                                     })}
                                 >
-                                    <Box as="option" value="late">Any</Box>
-                                    <Box as="option" value="early">10,11</Box>
-                                    <Box as="option" value="false">9,10,11</Box>
+                                    <Box as="option" value="any">Any</Box>
+                                    <Box as="option" value="tenEleven">10,11</Box>
+                                    <Box as="option" value="nineTenEleven">9,10,11</Box>
                                 </Box>
                         </Flex>
 
@@ -142,6 +144,7 @@ const ConfigurationPanel = ({ configuration, setConfiguration, hide, show = fals
                                 value={configuration.surrender}
                                 onChange={e => setConfiguration({
                                     ...configuration,
+                                    surrender: e.target.value,
                                 })}
                             >
                                 <Box as="option" value="late">Late</Box>
@@ -158,6 +161,7 @@ const ConfigurationPanel = ({ configuration, setConfiguration, hide, show = fals
                                 value={configuration.blackjackPays}
                                 onChange={e => setConfiguration({
                                     ...configuration,
+                                    blackjackPays: e.target.value,
                                 })}
                             >
                                 <Box as="option" value={1.5}>3 / 2</Box>

@@ -19,7 +19,7 @@ const variant = ({
     tx = 'variants',
 }) => css(get(theme, `${tx}.${variant}`, get(theme, variant)))(theme);
 
-export const Box = styled('div', {
+const Box = styled('div', {
     shouldForwardProp,
 })(
 base,
@@ -35,4 +35,6 @@ compose(
     flexbox,
 ));
 
-export const Flex = styled(Box)({ display: 'flex' });
+const Flex = styled(Box)({ display: 'flex' });
+
+export { Box, Flex, Box as default };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ThemeProvider } from '@emotion/react';
 import theme from './theme';
-import { Game } from './components/Game/Game';
+import Game from './components/Game/Game';
 
 function App() {
   return (

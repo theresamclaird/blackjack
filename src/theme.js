@@ -4,7 +4,8 @@ const colors = {
     yellow: '#ff0',
     gray: '#ccc',
     black: '#000',
-    red: '#f00',
+    white: '#ddd',
+    red: '#800',
 }
 
 const space = [0, 4, 8, 16, 32, 64, 128, 256];
@@ -33,10 +34,12 @@ const buttonStyle = {
     cursor: 'pointer',
 };
 
-export default {
+const theme = {
     colors,
     space,
     fonts,
     buttonStyle,
     textVariants,
 };
+
+export default theme;

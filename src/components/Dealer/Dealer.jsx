@@ -1,9 +1,23 @@
 import  React from 'react';
 import Box, { Flex } from '../Box';
-import { Text } from '../Text';
 import Card from '../Card';
-import { HandValue } from '../Hand';
+import Banner from '../Banner';
 import { getHandValue, isBlackjack } from '../../utils/cards';
+
+const DealerStatus = ({ cards }) => {
+    const sx={ px: 'xxl' };
+
+    if (isBlackjack(cards)) {
+        return <Banner message="BLACKJACK" sx={sx} />;
+    }
+
+    const handValue = getHandValue(cards);
+    if (handValue > 21) {
+        return <Banner message={`${handValue} (BUST)`} sx={sx} />;
+    }
+
+    return <Banner message={`${handValue}`} sx={sx} />;
+};
 
 const Dealer = ({ dealerCards, currentState }) => (
     <Flex sx={{
@@ -12,18 +26,9 @@ const Dealer = ({ dealerCards, currentState }) => (
         alignItems: 'center',
         gap: '1rem',
         width: '100%',
-        height: '15rem',
+        height: '12rem',
     }}>
-        <Box sx={{
-            width: '100%',
-            height: '9rem',
-            border: 'solid 2px',
-            borderLeft: 0,
-            borderRight: 0,
-            borderColor: 'white',
-            boxShadow: 'inset 0 0 3rem #003300',
-            p: '1rem',
-        }}>
+        <Box sx={{ width: '100%', p: '1rem' }}>
             <Flex sx={{
                 position: 'relative',
                 flexDirection: 'row',
@@ -35,45 +40,10 @@ const Dealer = ({ dealerCards, currentState }) => (
                         <Card showBack={index === 0 && currentState !== 'idle'} {...card} />
                     </React.Fragment>
                 ))}
-                {currentState === 'idle' && getHandValue(dealerCards) > 21 && (
-                    <Text sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        right: '50%',
-                        transform: 'translate(50%, -50%)',
-                        color: 'yellow',
-                        px: 'xxl',
-                        py: 'sm',
-                        border: 'solid 1px yellow',
-                        borderRadius: '0.25rem',
-                        textAlign: 'center',
-                        backgroundColor: '#030',
-                        boxShadow: '0 0 10px #000',
-                    }}>
-                        BUSTED
-                    </Text>
-                )}
-                {currentState === 'idle' && isBlackjack(dealerCards) && (
-                    <Text sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        right: '50%',
-                        transform: 'translate(50%, -50%)',
-                        color: 'yellow',
-                        px: 'xxl',
-                        py: 'sm',
-                        border: 'solid 1px yellow',
-                        borderRadius: '0.25rem',
-                        textAlign: 'center',
-                        backgroundColor: '#030',
-                        boxShadow: '0 0 10px #000',
-                    }}>
-                        BLACKJACK
-                    </Text>
-                )}
+                {currentState === 'offerInsurance' && <Banner message="Insurance?" />}
+                {currentState === 'idle' && dealerCards.length > 0 && <DealerStatus cards={dealerCards} />}
             </Flex>
         </Box>
-        <HandValue cards={currentState !== 'idle' ? [ dealerCards[1] ] : dealerCards} />
     </Flex>
 );
 
