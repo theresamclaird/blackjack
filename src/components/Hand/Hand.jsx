@@ -8,27 +8,28 @@ import { getHandValue, isSoft } from '../../utils/cards';
 
 const EmojiButton = ({ disabled, onClick, children, sx={} }) => (
     <Button
-    disabled={disabled} 
-    onClick={onClick}
-    sx={{
-        fontSize: '1.25rem',
-        background: 'transparent',
-        border: 0,
-        boxShadow: 0,
-        textShadow: '0 0 10px #000',
-        ':hover': {
+        disabled={disabled} 
+        onClick={onClick}
+        sx={{
+            fontSize: '1.66rem',
+            background: 'transparent',
+            border: 0,
+            boxShadow: 'none',
+            ':hover': {
+                textShadow: '0 0 5px #000',
+                ':disabled': {
+                    color: 'feltGreen',
+                    textShadow: 'none',
+                },
+            },
             ':disabled': {
                 color: 'feltGreen',
-                textShadow: 'none',
+                boxShadow: 'none',
+                cursor: 'default',
             },
-        },
-        ':disabled': {
-            color: 'feltGreen',
-            textShadow: 'none',
-            cursor: 'default',
-        },
-        ...sx,
-    }}>{children}</Button>
+            ...sx,
+        }}
+    >{children}</Button>
 );
 
 const Bet = ({ amount, sx }) => (
@@ -95,7 +96,7 @@ const Hand = ({
                         <Card {...card} sx={{
                             position: 'absolute',
                             left: `${2 + index}rem`,
-                            top: `${-1.5 + (-1 * index)}rem`,
+                            top: `${-2 + (-1 * index)}rem`,
                         }} />
                     </React.Fragment>
                 ))}
@@ -128,7 +129,6 @@ const Hand = ({
                     backgroundColor: active ? '#040' : 'transparent',
                     boxShadow: active ? '' : 'inset 0 0 5rem #030',
                     p: '1rem',
-                    gap: '0.5rem',
                 }}>
                     <Flex sx={{
                         width: '100%',
@@ -156,7 +156,7 @@ const Hand = ({
                     color: 'white',
                     position: 'absolute',
                     left: '0.2rem',
-                    top: '4.4rem',
+                    top: '4rem',
                     width: '1.7rem',
                     textAlign: 'right',
                 }}>{isSoft(hand.cards) ? `${handValue - 10}/${handValue}` : handValue}</Text>

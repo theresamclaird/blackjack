@@ -15,7 +15,6 @@ const Button = ({ sx, children, ...props }) => (
       border: 'solid 1px',
       borderColor: 'darkGreen',
       borderRadius: '0.25rem',
-      boxShadow: '0 0 5px #000',
       cursor: 'pointer',
       ':disabled': {
         color: 'feltGreen',
@@ -23,9 +22,15 @@ const Button = ({ sx, children, ...props }) => (
         borderColor: 'feltGreen',
         boxShadow: 'none',
         cursor: 'default',
-        ':hover': { color: 'feltGreen' },
+        ':hover': {
+          color: 'feltGreen',
+          boxShadow: 'none',
+        },
       },
-      ':hover': { color: '#fff' },
+      ':hover': {
+        color: '#fff',
+        boxShadow: '0 0 5px #000',
+      },
       ...sx,
     }}
     as="button"
