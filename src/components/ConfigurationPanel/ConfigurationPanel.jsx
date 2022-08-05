@@ -13,16 +13,15 @@ const ConfigurationPanel = ({ configuration, setConfiguration, hide, show = fals
             transform: 'translate(-50%)',
         }}>
             <Box sx={{
-                backgroundColor: 'feltGreen',
+                backgroundColor: 'darkGreen',
                 border: 'solid 1px',
-                borderColor: 'darkGreen',
+                borderColor: 'black',
                 borderRadius: '0.25rem',
-                color: 'white',
                 boxShadow: '2px 2px 20px #333',
                 p: 'md',
             }}>
                 <Flex sx={{ flexDirection: 'row', justifyContent: 'space-between', py: '0.1rem', mb: '0.5rem' }}>
-                    <Text>Configuration</Text>
+                    <Text sx={{ color: 'white' }}>Configuration</Text>
                     <Text sx={{ fontSize: '0.66rem', cursor: 'pointer' }} onClick={hide}>❌</Text>
                 </Flex>
 
@@ -31,7 +30,7 @@ const ConfigurationPanel = ({ configuration, setConfiguration, hide, show = fals
                     sx={{
                         p: 'lg',
                         border: 'solid 1px #000',
-                        boxShadow: 'inset 0 0 10rem #030',
+                        backgroundColor: 'feltGreen',
                     }}
                 >
                     <Flex as="fieldset" sx={{ flexDirection: 'column', gap: '1rem', minWidth: '15rem' }}>
