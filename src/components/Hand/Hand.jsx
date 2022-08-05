@@ -17,7 +17,6 @@ const EmojiButton = ({ disabled, onClick, children, sx={} }) => (
         boxShadow: 0,
         textShadow: '0 0 10px #000',
         ':hover': {
-            color: '#f00',
             ':disabled': {
                 color: 'feltGreen',
                 textShadow: 'none',
@@ -108,6 +107,14 @@ const Hand = ({
                         position: 'absolute',
                         left: '-0.4rem',
                         top: '-0.2em',
+                        ':hover': {
+                            color: '#f00',
+                        },
+                        ':disabled': {
+                            color: 'feltGreen',
+                            ':hover': { color: 'feltGreen' },
+                            cursor: 'default',
+                        },
                     }}
                     disabled={!hand.split && (!canRemoveHand || currentState !== 'idle')} 
                     onClick={removeHand}>X</EmojiButton>
