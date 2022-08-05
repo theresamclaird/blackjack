@@ -40,7 +40,7 @@ const Dealer = ({ dealerCards, currentState }) => (
                         <Card showBack={index === 0 && currentState !== 'idle'} {...card} />
                     </React.Fragment>
                 ))}
-                {currentState === 'offerInsurance' && <Banner message="Insurance?" />}
+                {currentState === 'offerInsurance' && <Banner message="Insurance?" sx={{ px: 'xxl' }} />}
                 {currentState === 'idle' && dealerCards.length > 0 && <DealerStatus cards={dealerCards} />}
             </Flex>
         </Box>
