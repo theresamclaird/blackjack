@@ -13,7 +13,7 @@ const Player = ({
         flexDirection: 'column',
         justifyContent: 'space-around',
         alignItems: 'center',
-        gap: '2rem',
+        gap: '1rem',
         height: '100%',
     }}>
         <Flex sx={{ flexDirection: 'row', justifyContent: 'space-around', gap: '5rem' }}>
