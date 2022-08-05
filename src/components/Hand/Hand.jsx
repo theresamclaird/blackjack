@@ -50,7 +50,7 @@ const Bet = ({ amount, sx }) => (
             border: 'solid 1px',
             borderColor: 'black',
             borderRadius: '2rem',
-            boxShadow: '1px 1px  10px #000',
+            boxShadow: '1px 1px  5px #000',
             ...sx,
         }}>{amount}</Flex>
 );
