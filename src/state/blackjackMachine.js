@@ -19,6 +19,7 @@ const newHand = {
     offerInsurance: false,
     complete: false,
     settled: false,
+    split: false,
 };
 
 const blackjackMachine = 
@@ -114,7 +115,7 @@ createMachine({
           target: "dealer",
         },
         {
-          actions: "addCardToHand",
+          actions: ["addCardToHandAfterSplit", "setCurrentHandIndex"],
           cond: "handNeedsSecondCard",
         },
       ],
@@ -153,7 +154,7 @@ createMachine({
 {
     guards: {
         dealerShowsAce: ({ dealerCards }) => getUpCardValue(dealerCards) === 1,
-        dealerShowsTen: ({ dealerCards }) => getUpCardValue(dealerCards) === 10,
+        dealerShowsTen: ({ dealerCards, configuration }) => configuration.dealerPeek && getUpCardValue(dealerCards) === 10,
         allHandsResponded: ({ hands }) => hands.filter(hand => hand.offerInsurance).length < 1,
         dealerHasBlackjack: ({ dealerCards }) => isBlackjack(dealerCards),
         allHandsComplete: ({ hands }) => hands.filter(hand => !hand.complete).length < 1,
@@ -202,14 +203,31 @@ createMachine({
                 shoe = cut(shoe, getRandomNumberInRange(cutRange.min, cutRange.max));
             }
 
-            const hands = [ ...context.hands ]
-                .filter(hand => !hand.split)
-                .map(hand => ({
-                    ...hand,
-                    cards: [],
-                    complete: false,
-                    settled: false,
-                }));
+            // Automatically retrieve bets from hands added due to split.
+            let bankroll = context.bankroll;
+            let hands = [ ...context.hands ];
+            for (let i = 0; i < hands.length; i++) {
+              if (hands[i]?.split && hands?.[i + 1]?.split) { // Two consecutive split hands.
+
+                if (hands[i].bet === 0) {
+                  hands[i + 1].split = false;
+                } else {
+                  bankroll += hands[i + 1].bet;
+                  hands[i].split = false;
+                }
+
+              } else {
+                hands[i].split = false;
+              }
+            }
+
+            // Filter out hands still marked as split and reset attributes.
+            hands = hands.filter(hand => !hand.split).map(hand => ({
+              ...hand,
+              cards: [],
+              complete: false,
+              settled: false,
+            }));
 
             shoe.pop(); // Burn a card.
             let dealerCards = [];
@@ -220,6 +238,7 @@ createMachine({
 
             return {
                 ...context,
+                bankroll,
                 configuration, // todo This is not ideal; I am adding this to give actions access to the configuration.
                 shoe,
                 hands,
@@ -384,23 +403,26 @@ createMachine({
                 hands: context.hands.map((hand, index) => index === handIndex ? { ...hand, cards } : hand),
             };
         }),
-        addCardToHand: assign(context => {
+        addCardToHandAfterSplit: assign(context => {
             const shoe = [ ...context.shoe ];
             const { currentHandIndex } = context;
             const cards = [ ...context.hands[currentHandIndex].cards ];
             cards.push(shoe.pop());
+
             return {
                 ...context,
                 shoe,
-                hands: context.hands.map((hand, index) => index === currentHandIndex ? { ...hand, cards, } : hand),
+                hands: context.hands.map((hand, index) => index === currentHandIndex ? {
+                  ...hand,
+                  cards,
+                  complete: hand.cards[0].value === 1,
+                } : hand),
             };
         }),
         doubleHand: assign((context, { payload: { handIndex } }) => {
 
             const betAmount = context.hands[handIndex].bet;
             const bankroll = context.bankroll - betAmount;
-
-            console.log('doubleHand', { betAmount, bankroll });
 
             const hands = context.hands.map((hand, index) => index === handIndex ? {
                 ...hand,
@@ -440,22 +462,25 @@ createMachine({
         }),
         splitHand: assign((context, event) => {
             const { handIndex } = event.payload;
+            const bet = context.hands[handIndex].bet;
 
-            const originalHand = { ...context.hands[handIndex] };
+            console.log('splitHand', bet);
+
+            const originalHand = { ...context.hands[handIndex], split: true, bet };
             originalHand.cards = [ ...originalHand.cards ];
 
-            const splitHand = { ...originalHand, cards: [], split: true };
+            const splitHand = { ...originalHand, cards: [], split: true, bet };
             splitHand.cards.push(originalHand.cards.pop());
 
-            const hands = context.hands.map((hand, index) => index === handIndex ? originalHand : hand);
-
+            const hands = context.hands;
+            hands[handIndex] = originalHand;
             hands.splice(handIndex, 0, splitHand);
 
             return {
-                ...context,
-                hands,
-                bankroll: context.bankroll - originalHand.bet,
-                                                    };
+              ...context,
+              hands,
+              bankroll: context.bankroll - bet,
+            };
         }),
     },
 });

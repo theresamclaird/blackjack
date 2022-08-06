@@ -26,7 +26,7 @@ const StatusBar = ({ context, configuration, setConfiguration }) => {
                         color: 'white',
                     }}
                     onClick={() => setShowConfiguration(!showConfiguration)}>⚙️</Text>
-                <Text sx={{ color: 'yellow' }}>{`Bankroll: ${context.bankroll}`}</Text>
+                <Text sx={{ color: 'yellow' }}>{`${context.bank}/${context.bankroll}`}</Text>
             </Flex>
             <ConfigurationPanel
                 show={showConfiguration}

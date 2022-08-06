@@ -1,34 +1,13 @@
 import React, { useState } from 'react';
 import { useMachine } from '@xstate/react';
-import { Flex } from '../Box';
+import Box, { Flex } from '../Box';
 import Player from '../Player';
 import Hand from '../Hand';
 import Table from '../Table';
 import Dealer from '../Dealer';
 import StatusBar from '../StatusBar';
 import blackjackMachine from '../../state/blackjackMachine';
-import { getHandValue } from '../../utils/cards';
-
-/*
-    todo:
-        - bug: split aces and get a ten and it will be counted as a blackjack.
-        - Add unit tests.
-        - Hook up configuration to game logic.
-        - Fix accounting bug?
-        - Allow the player to scroll horizontally to see all hands.
-*/
-
-// const surrenderOptions = {
-//     late: 'late',
-//     early: 'early',
-//     false: 'false,'
-// };
-
-// const doubleOptions = {
-//     any: 'any',
-//     tenEleven: 'tenEleven',
-//     nineTenEleven: 'nineTenEleven',
-// };
+import { getHandValue, getUpCardValue } from '../../utils/cards';
 
 const Game = () => {
     const [configuration, setConfiguration] = useState(() => ({
@@ -38,9 +17,12 @@ const Game = () => {
         dealerPeek: true,
         dealerHitsSoft17: true,
         doubleAfterSplit: true,
-        surrender: 'late', // Can be false, 'early', or 'late'.
+        surrender: 'late', // Can be 'late', 'early', or false.
+        surrenderOn: 'any', // Can be 'any' or 'notAces'.
         blackjackPays: 3 / 2,
         double: 'any', // Can be 'any', 'tenEleven', or 'nineTenEleven'.
+        drawAfterSplitAces: false,
+        resplitAces: false,
     }));
     const [machine, send] = useMachine(blackjackMachine);
 
@@ -48,6 +30,17 @@ const Game = () => {
     if (machine.context.bank + machine.context.bankroll + totalBets !== 0) {
         console.error('Accounting error.', { bank: machine.context.bank, bankroll: machine.context.bankroll, totalBets });
     }
+
+    const doubleConfiguration = {
+        any: [1,2,3,4,5,6,7,8,9,10],
+        tenEleven: [1,10],
+        nineTenEleven: [1,9,10],
+    }[configuration.double];
+
+    const canDouble = doubleConfiguration.includes(getUpCardValue(machine?.context?.dealerCards));
+
+    const canSurrender = (configuration.surrender === 'early' && machine?.configuration?.currentState === 'offerInsurance') ||
+            (configuration.surrender === 'late' && machine?.configuration?.currentState === 'player');
 
     return (
         <Flex sx={{
@@ -75,23 +68,27 @@ const Game = () => {
                         bankroll={machine?.context?.bankroll}
                         hands={machine?.context?.hands}
                         renderHand={handIndex => (
-                            <Hand
-                                canRemoveHand={machine?.context?.hands.length > 1}
-                                active={handIndex === machine?.context?.currentHandIndex}
-                                currentState={machine?.value}
-                                hand={machine?.context?.hands?.[handIndex]}
-                                removeHand={() => send({ type: 'REMOVE_HAND', payload: { handIndex } })}
-                                incrementBet={() => send({ type: 'INCREMENT_BET', payload: { handIndex, configuration } })}
-                                decrementBet={() => send({ type: 'DECREMENT_BET', payload: { handIndex, configuration } })}
-                                clearBet={() => send({ type: 'CLEAR_BET', payload: { handIndex, configuration } })}
-                                acceptInsuranceBet={() => send({ type: 'ACCEPT', payload: { handIndex, configuration } })}
-                                declineInsuranceBet={() => send({ type: 'DECLINE', payload: { handIndex, configuration } })}
-                                stand={() => send({ type: 'STAND', payload: { handIndex } })}
-                                hit={() => send({ type: 'HIT', payload: { handIndex } })}
-                                surrender={() => send({ type:'SURRENDER', payload: { handIndex, configuration } })}
-                                double={() => send({ type: 'DOUBLE', payload: { handIndex } })}
-                                split={() => send({ type: 'SPLIT', payload: { handIndex } })}
-                            />
+                            <Box>
+                                <Hand
+                                    canDouble={canDouble}
+                                    canSurrender={canSurrender}
+                                    canRemoveHand={machine?.context?.hands.length > 1}
+                                    active={handIndex === machine?.context?.currentHandIndex}
+                                    currentState={machine?.value}
+                                    hand={machine?.context?.hands?.[handIndex]}
+                                    removeHand={() => send({ type: 'REMOVE_HAND', payload: { handIndex } })}
+                                    incrementBet={() => send({ type: 'INCREMENT_BET', payload: { handIndex, configuration } })}
+                                    decrementBet={() => send({ type: 'DECREMENT_BET', payload: { handIndex, configuration } })}
+                                    clearBet={() => send({ type: 'CLEAR_BET', payload: { handIndex, configuration } })}
+                                    acceptInsuranceBet={() => send({ type: 'ACCEPT', payload: { handIndex, configuration } })}
+                                    declineInsuranceBet={() => send({ type: 'DECLINE', payload: { handIndex, configuration } })}
+                                    stand={() => send({ type: 'STAND', payload: { handIndex } })}
+                                    hit={() => send({ type: 'HIT', payload: { handIndex } })}
+                                    surrender={() => send({ type:'SURRENDER', payload: { handIndex, configuration } })}
+                                    double={() => send({ type: 'DOUBLE', payload: { handIndex } })}
+                                    split={() => send({ type: 'SPLIT', payload: { handIndex } })}
+                                />
+                            </Box>
                         )}
                     />
                 }

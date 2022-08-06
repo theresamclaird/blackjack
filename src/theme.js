@@ -6,6 +6,8 @@ const colors = {
     black: '#000',
     white: '#ddd',
     red: '#800',
+    darkRed: '#600',
+    lightRed: '#a00',
 }
 
 const space = [0, 4, 8, 16, 32, 64, 128, 256];

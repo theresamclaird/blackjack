@@ -43,19 +43,21 @@ const Bet = ({ amount, sx }) => (
             height: '4rem',
             width: '4rem',
             color: 'white',
-            backgroundColor: amount === 0 ? '#999' : 'red',
+            backgroundColor: amount === 0 ? 'feltGreen' : 'darkRed',
             outline: 'outset 5px',
             outlineOffset: '-8px',
-            outlineColor: '#ccc',
+            outlineColor: amount === 0 ? 'darkGreen' : 'lightRed',
             border: 'solid 1px',
-            borderColor: 'black',
+            borderColor: amount === 0 ? 'feltGreen' : 'black',
             borderRadius: '2rem',
-            boxShadow: '1px 1px  5px #000',
+            boxShadow: amount === 0 ? 'none' : '1px 1px  5px #000',
             ...sx,
         }}>{amount}</Flex>
 );
 
 const Hand = ({
+    canDouble,
+    canSurrender,
     canRemoveHand,
     active,
     currentState,
@@ -76,6 +78,13 @@ const Hand = ({
     const canSplit = isInitial && hand.cards[0].value === hand.cards[1].value;
     const handValue = getHandValue(hand.cards);
 
+    const rotateCard = {
+        transform: 'rotate(0.25turn) translate(0, 1rem)',
+    };
+
+    const doubleDisabled = !canDouble || !isInitial || !active || currentState !== 'player';
+    const surrenderDisabled = !canSurrender || !isInitial || !active;
+
     return (
         <Flex sx={{
             mt: '1rem',
@@ -91,15 +100,18 @@ const Hand = ({
                 borderRadius: '0.25rem',
                 boxShadow: '0 0 10px #333',
             }}>
-                {hand.cards.map((card, index) => (
-                    <React.Fragment key={`player-card-seat-${index}`}>
-                        <Card {...card} sx={{
-                            position: 'absolute',
-                            left: `${2 + index}rem`,
-                            top: `${-2 + (-1 * index)}rem`,
-                        }} />
-                    </React.Fragment>
-                ))}
+                {hand.cards.map((card, index) => {
+                    return (
+                        <React.Fragment key={`player-card-seat-${index}`}>
+                            <Card {...card} sx={{
+                                ...hand.split && index === 1 ? rotateCard : {},
+                                position: 'absolute',
+                                left: `${2 + index}rem`,
+                                top: `${-2 + (-1 * index)}rem`,
+                            }} />
+                        </React.Fragment>
+                    );
+                })}
                 <EmojiButton
                     sx={{
                         color: 'red',
@@ -175,11 +187,11 @@ const Hand = ({
             <Flex sx={{ flexDirection: 'column', justifyContent: 'center', gap: '1rem' }}>
                 <Flex sx={{ flexDirection: 'row', justifyContent: 'center', gap: '1rem' }}>
                     <Button
-                        disabled={!isInitial || !active || currentState !== 'player'}
+                        disabled={doubleDisabled}
                         onClick={double}
                         as="button">Double</Button>
                     <Button
-                        disabled={!isInitial || !active || currentState !== 'player'}
+                        disabled={surrenderDisabled}
                         onClick={surrender}
                         as="button">Surrender</Button>
                     <Button
