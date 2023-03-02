@@ -1,6 +1,6 @@
 import  React from 'react';
 import Box, { Flex } from '../Box';
-import { Card } from '@theresamclaird/cards';
+import { Back, Card } from '@theresamclaird/cards';
 import Banner from '../Banner';
 import { getHandValue, isBlackjack } from '../../utils/cards';
 
@@ -37,7 +37,7 @@ const Dealer = ({ dealerCards, currentState }) => (
             }}>
                 {dealerCards.map((card, index) => (
                     <React.Fragment key={`dealer-card-${index}`}>
-                        <Card showBack={index === 0 && currentState !== 'idle'} {...card} />
+                        {index === 0 && currentState !== 'idle' ? <Back /> : <Card {...card} />}
                     </React.Fragment>
                 ))}
                 {currentState === 'offerInsurance' && <Banner message="Insurance?" sx={{ px: 'xxl' }} />}
