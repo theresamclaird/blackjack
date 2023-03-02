@@ -1,6 +1,6 @@
 import  React from 'react';
 import Box, { Flex } from '../Box';
-import Card from '../Card';
+import { Card } from '@theresamclaird/cards';
 import Banner from '../Banner';
 import { getHandValue, isBlackjack } from '../../utils/cards';
 

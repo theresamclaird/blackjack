@@ -1,13 +1,12 @@
 import { createMachine, assign } from 'xstate';
+import { getShoe, cut } from '@theresamclaird/cards';
 import {
-    getShoe,
     getUpCardValue,
     isBlackjack,
     getHandValue,
     isSoft,
     isBusted,
     shuffle,
-    cut,
  } from '../utils/cards';
 import { getRandomNumberInRange } from '../utils/random';
 

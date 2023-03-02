@@ -1,19 +1,12 @@
 import { getRandomNumberInRange } from '../../utils/random';
+import { getDeck } from '@theresamclaird/cards';
 import {
-    getDeck,
     isSoft,
     isBusted,
     getUpCardValue,
     isBlackjack,
     getHandValue,
 } from '../../utils/cards';
-
-/*
-    todo:
-        Add disabled to buttons.
-        Add a button to each hand to remove it.
-
-*/
 
 const newHand = {
     bet: 0,
