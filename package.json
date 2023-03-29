@@ -6,7 +6,7 @@
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
     "@styled-system/should-forward-prop": "^5.1.5",
-    "@theresamclaird/cards": "^0.0.13",
+    "@theresamclaird/cards": "^0.0.14",
     "@xstate/react": "^3.0.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
